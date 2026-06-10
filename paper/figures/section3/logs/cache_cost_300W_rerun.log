@@ -1,0 +1,801 @@
+=== 2026-05-20T13:07:37-05:00 starting 300W cache_cost: 4 shards across GPU 0-3 ===
+INFO 05-20 13:07:40 [__init__.py:216] Automatically detected platform cuda.
+INFO 05-20 13:07:40 [__init__.py:216] Automatically detected platform cuda.
+INFO 05-20 13:07:40 [__init__.py:216] Automatically detected platform cuda.
+INFO 05-20 13:07:40 [__init__.py:216] Automatically detected platform cuda.
+INFO 05-20 13:07:42 [utils.py:233] non-default args: {'download_dir': '/data/projects/AgentScaling/models', 'max_model_len': 81920, 'enable_prefix_caching': True, 'max_num_batched_tokens': 67584, 'max_num_seqs': 64, 'disable_log_stats': True, 'rope_scaling': {'rope_type': 'dynamic', 'factor': 2.5}, 'enforce_eager': True}
+INFO 05-20 13:07:42 [utils.py:233] non-default args: {'download_dir': '/data/projects/AgentScaling/models', 'max_model_len': 81920, 'enable_prefix_caching': True, 'max_num_batched_tokens': 67584, 'max_num_seqs': 64, 'disable_log_stats': True, 'rope_scaling': {'rope_type': 'dynamic', 'factor': 2.5}, 'enforce_eager': True}
+INFO 05-20 13:07:42 [utils.py:233] non-default args: {'download_dir': '/data/projects/AgentScaling/models', 'max_model_len': 81920, 'enable_prefix_caching': True, 'max_num_batched_tokens': 67584, 'max_num_seqs': 64, 'disable_log_stats': True, 'rope_scaling': {'rope_type': 'dynamic', 'factor': 2.5}, 'enforce_eager': True}
+INFO 05-20 13:07:42 [utils.py:233] non-default args: {'download_dir': '/data/projects/AgentScaling/models', 'max_model_len': 81920, 'enable_prefix_caching': True, 'max_num_batched_tokens': 67584, 'max_num_seqs': 64, 'disable_log_stats': True, 'rope_scaling': {'rope_type': 'dynamic', 'factor': 2.5}, 'enforce_eager': True}
+WARNING 05-20 13:07:48 [model.py:371] The global random seed is set to 0. Since VLLM_ENABLE_V1_MULTIPROCESSING is set to False, this may affect the random state of the Python process that launched vLLM.
+WARNING 05-20 13:07:48 [model.py:371] The global random seed is set to 0. Since VLLM_ENABLE_V1_MULTIPROCESSING is set to False, this may affect the random state of the Python process that launched vLLM.
+WARNING 05-20 13:07:48 [model.py:371] The global random seed is set to 0. Since VLLM_ENABLE_V1_MULTIPROCESSING is set to False, this may affect the random state of the Python process that launched vLLM.
+WARNING 05-20 13:07:48 [model.py:371] The global random seed is set to 0. Since VLLM_ENABLE_V1_MULTIPROCESSING is set to False, this may affect the random state of the Python process that launched vLLM.
+INFO 05-20 13:07:48 [model.py:547] Resolved architecture: Qwen3ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 05-20 13:07:48 [model.py:547] Resolved architecture: Qwen3ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 05-20 13:07:48 [model.py:1510] Using max model len 81920
+INFO 05-20 13:07:48 [model.py:547] Resolved architecture: Qwen3ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 05-20 13:07:48 [model.py:1510] Using max model len 81920
+INFO 05-20 13:07:48 [model.py:1510] Using max model len 81920
+INFO 05-20 13:07:49 [model.py:547] Resolved architecture: Qwen3ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 05-20 13:07:49 [model.py:1510] Using max model len 81920
+INFO 05-20 13:07:49 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=67584.
+INFO 05-20 13:07:49 [__init__.py:381] Cudagraph is disabled under eager mode
+INFO 05-20 13:07:49 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=67584.
+INFO 05-20 13:07:49 [__init__.py:381] Cudagraph is disabled under eager mode
+INFO 05-20 13:07:49 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=67584.
+INFO 05-20 13:07:49 [__init__.py:381] Cudagraph is disabled under eager mode
+No core log file configured
+No core log file configured
+INFO 05-20 13:07:50 [core.py:95] Initializing a V1 LLM engine (v0.11.0) with config: model='Qwen/Qwen3-0.6B', speculative_config=None, tokenizer='Qwen/Qwen3-0.6B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=81920, download_dir='/data/projects/AgentScaling/models', load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=Qwen/Qwen3-0.6B, enable_prefix_caching=True, chunked_prefill_enabled=True, pooler_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":null,"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"cudagraph_mode":0,"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":[],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"use_inductor_graph_partition":false,"pass_config":{},"max_capture_size":0,"local_cache_dir":null}
+No core log file configured
+No core log file configured
+INFO 05-20 13:07:50 [core.py:95] Initializing a V1 LLM engine (v0.11.0) with config: model='Qwen/Qwen3-0.6B', speculative_config=None, tokenizer='Qwen/Qwen3-0.6B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=81920, download_dir='/data/projects/AgentScaling/models', load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=Qwen/Qwen3-0.6B, enable_prefix_caching=True, chunked_prefill_enabled=True, pooler_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":null,"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"cudagraph_mode":0,"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":[],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"use_inductor_graph_partition":false,"pass_config":{},"max_capture_size":0,"local_cache_dir":null}
+No core log file configured
+No core log file configured
+INFO 05-20 13:07:50 [core.py:95] Initializing a V1 LLM engine (v0.11.0) with config: model='Qwen/Qwen3-0.6B', speculative_config=None, tokenizer='Qwen/Qwen3-0.6B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=81920, download_dir='/data/projects/AgentScaling/models', load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=Qwen/Qwen3-0.6B, enable_prefix_caching=True, chunked_prefill_enabled=True, pooler_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":null,"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"cudagraph_mode":0,"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":[],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"use_inductor_graph_partition":false,"pass_config":{},"max_capture_size":0,"local_cache_dir":null}
+INFO 05-20 13:07:50 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=67584.
+INFO 05-20 13:07:50 [__init__.py:381] Cudagraph is disabled under eager mode
+No core log file configured
+No core log file configured
+INFO 05-20 13:07:51 [core.py:95] Initializing a V1 LLM engine (v0.11.0) with config: model='Qwen/Qwen3-0.6B', speculative_config=None, tokenizer='Qwen/Qwen3-0.6B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=81920, download_dir='/data/projects/AgentScaling/models', load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=Qwen/Qwen3-0.6B, enable_prefix_caching=True, chunked_prefill_enabled=True, pooler_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":null,"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"cudagraph_mode":0,"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":[],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"use_inductor_graph_partition":false,"pass_config":{},"max_capture_size":0,"local_cache_dir":null}
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+INFO 05-20 13:07:52 [parallel_state.py:1208] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+INFO 05-20 13:07:53 [parallel_state.py:1208] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+INFO 05-20 13:07:53 [parallel_state.py:1208] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+WARNING 05-20 13:07:53 [topk_topp_sampler.py:66] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+WARNING 05-20 13:07:53 [topk_topp_sampler.py:66] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+WARNING 05-20 13:07:53 [topk_topp_sampler.py:66] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+INFO 05-20 13:07:53 [gpu_model_runner.py:2611] Starting to load model Qwen/Qwen3-0.6B...
+INFO 05-20 13:07:53 [gpu_model_runner.py:2611] Starting to load model Qwen/Qwen3-0.6B...
+INFO 05-20 13:07:53 [gpu_model_runner.py:2611] Starting to load model Qwen/Qwen3-0.6B...
+INFO 05-20 13:07:53 [gpu_model_runner.py:2643] Loading model from scratch...
+INFO 05-20 13:07:53 [cuda.py:366] Using Flash Attention backend on V1 engine.
+INFO 05-20 13:07:53 [gpu_model_runner.py:2643] Loading model from scratch...
+INFO 05-20 13:07:53 [gpu_model_runner.py:2643] Loading model from scratch...
+INFO 05-20 13:07:53 [cuda.py:366] Using Flash Attention backend on V1 engine.
+INFO 05-20 13:07:53 [cuda.py:366] Using Flash Attention backend on V1 engine.
+INFO 05-20 13:07:53 [weight_utils.py:392] Using model weights format ['*.safetensors']
+INFO 05-20 13:07:54 [weight_utils.py:450] No model.safetensors.index.json found in remote.
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+INFO 05-20 13:07:54 [weight_utils.py:392] Using model weights format ['*.safetensors']
+INFO 05-20 13:07:54 [weight_utils.py:392] Using model weights format ['*.safetensors']
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.98it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.97it/s]
+
+INFO 05-20 13:07:54 [default_loader.py:267] Loading weights took 0.22 seconds
+INFO 05-20 13:07:54 [weight_utils.py:450] No model.safetensors.index.json found in remote.
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+INFO 05-20 13:07:54 [weight_utils.py:450] No model.safetensors.index.json found in remote.
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.26it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.25it/s]
+
+INFO 05-20 13:07:54 [default_loader.py:267] Loading weights took 0.24 seconds
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.69it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.69it/s]
+
+INFO 05-20 13:07:54 [default_loader.py:267] Loading weights took 0.23 seconds
+INFO 05-20 13:07:54 [gpu_model_runner.py:2662] Model loading took 1.1365 GiB and 0.605612 seconds
+INFO 05-20 13:07:55 [gpu_model_runner.py:2662] Model loading took 1.1365 GiB and 0.701770 seconds
+INFO 05-20 13:07:55 [gpu_model_runner.py:2662] Model loading took 1.1365 GiB and 0.859843 seconds
+INFO 05-20 13:07:56 [gpu_worker.py:298] Available KV cache memory: 37.16 GiB
+INFO 05-20 13:07:56 [gpu_worker.py:298] Available KV cache memory: 37.16 GiB
+INFO 05-20 13:07:56 [kv_cache_utils.py:1087] GPU KV cache size: 347,872 tokens
+INFO 05-20 13:07:56 [kv_cache_utils.py:1091] Maximum concurrency for 81,920 tokens per request: 4.25x
+WARNING 05-20 13:07:56 [cudagraph_dispatcher.py:106] cudagraph dispatching keys are not initialized. No cudagraph will be used.
+INFO 05-20 13:07:56 [core.py:228] init engine (profile, create kv cache, warmup model) took 2.16 seconds
+INFO 05-20 13:07:57 [gpu_worker.py:298] Available KV cache memory: 37.16 GiB
+INFO 05-20 13:07:57 [kv_cache_utils.py:1087] GPU KV cache size: 347,872 tokens
+INFO 05-20 13:07:57 [kv_cache_utils.py:1091] Maximum concurrency for 81,920 tokens per request: 4.25x
+WARNING 05-20 13:07:57 [cudagraph_dispatcher.py:106] cudagraph dispatching keys are not initialized. No cudagraph will be used.
+INFO 05-20 13:07:57 [core.py:228] init engine (profile, create kv cache, warmup model) took 2.14 seconds
+INFO 05-20 13:07:57 [kv_cache_utils.py:1087] GPU KV cache size: 347,872 tokens
+INFO 05-20 13:07:57 [kv_cache_utils.py:1091] Maximum concurrency for 81,920 tokens per request: 4.25x
+WARNING 05-20 13:07:57 [cudagraph_dispatcher.py:106] cudagraph dispatching keys are not initialized. No cudagraph will be used.
+INFO 05-20 13:07:57 [core.py:228] init engine (profile, create kv cache, warmup model) took 2.16 seconds
+Scheduler config:  SchedulerConfig(runner_type='generate', max_num_batched_tokens=67584, max_num_seqs=64, max_model_len=81920, max_num_partial_prefills=1, max_long_partial_prefills=1, long_prefill_token_threshold=0, num_lookahead_slots=0, cuda_graph_sizes=[128], enable_chunked_prefill=True, is_multimodal_model=False, max_num_encoder_input_tokens=67584, encoder_cache_size=67584, send_delta_data=False, policy='fcfs', chunked_prefill_enabled=True, disable_chunked_mm_input=False, scheduler_cls='vllm.v1.core.sched.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, async_scheduling=False)
+INFO 05-20 13:07:57 [llm.py:310] Supported_tasks: ('generate',)
+warmup...
+Scheduler config:  SchedulerConfig(runner_type='generate', max_num_batched_tokens=67584, max_num_seqs=64, max_model_len=81920, max_num_partial_prefills=1, max_long_partial_prefills=1, long_prefill_token_threshold=0, num_lookahead_slots=0, cuda_graph_sizes=[128], enable_chunked_prefill=True, is_multimodal_model=False, max_num_encoder_input_tokens=67584, encoder_cache_size=67584, send_delta_data=False, policy='fcfs', chunked_prefill_enabled=True, disable_chunked_mm_input=False, scheduler_cls='vllm.v1.core.sched.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, async_scheduling=False)
+INFO 05-20 13:07:58 [llm.py:310] Supported_tasks: ('generate',)
+warmup...
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+INFO 05-20 13:07:58 [parallel_state.py:1208] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+WARNING 05-20 13:07:58 [topk_topp_sampler.py:66] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+Scheduler config:  SchedulerConfig(runner_type='generate', max_num_batched_tokens=67584, max_num_seqs=64, max_model_len=81920, max_num_partial_prefills=1, max_long_partial_prefills=1, long_prefill_token_threshold=0, num_lookahead_slots=0, cuda_graph_sizes=[128], enable_chunked_prefill=True, is_multimodal_model=False, max_num_encoder_input_tokens=67584, encoder_cache_size=67584, send_delta_data=False, policy='fcfs', chunked_prefill_enabled=True, disable_chunked_mm_input=False, scheduler_cls='vllm.v1.core.sched.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, async_scheduling=False)
+INFO 05-20 13:07:58 [llm.py:310] Supported_tasks: ('generate',)
+warmup...
+INFO 05-20 13:07:58 [gpu_model_runner.py:2611] Starting to load model Qwen/Qwen3-0.6B...
+INFO 05-20 13:07:59 [gpu_model_runner.py:2643] Loading model from scratch...
+INFO 05-20 13:07:59 [cuda.py:366] Using Flash Attention backend on V1 engine.
+INFO 05-20 13:07:59 [weight_utils.py:392] Using model weights format ['*.safetensors']
+INFO 05-20 13:07:59 [weight_utils.py:450] No model.safetensors.index.json found in remote.
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.63it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.63it/s]
+
+INFO 05-20 13:07:59 [default_loader.py:267] Loading weights took 0.23 seconds
+INFO 05-20 13:08:00 [gpu_model_runner.py:2662] Model loading took 1.1365 GiB and 0.715094 seconds
+Starting batch processing with fixed batch...
+2026-05-20T13:07:57.767449 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:07:57.810777 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+Starting batch processing with fixed batch...
+2026-05-20T13:07:58.442459 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:07:58.660194 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+Starting batch processing with fixed batch...
+2026-05-20T13:08:00.103345 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-20T13:08:01.893317 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+warmup done
+INFO 05-20 13:08:02 [gpu_worker.py:298] Available KV cache memory: 37.16 GiB
+INFO 05-20 13:08:02 [kv_cache_utils.py:1087] GPU KV cache size: 347,872 tokens
+INFO 05-20 13:08:02 [kv_cache_utils.py:1091] Maximum concurrency for 81,920 tokens per request: 4.25x
+WARNING 05-20 13:08:02 [cudagraph_dispatcher.py:106] cudagraph dispatching keys are not initialized. No cudagraph will be used.
+INFO 05-20 13:08:02 [core.py:228] init engine (profile, create kv cache, warmup model) took 2.17 seconds
+Starting batch processing with fixed batch...
+2026-05-20T13:07:58.466164 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:07:58.508758 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+Starting batch processing with fixed batch...
+2026-05-20T13:07:59.147693 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:07:59.365799 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+Starting batch processing with fixed batch...
+2026-05-20T13:08:00.802064 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-20T13:08:02.561199 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+warmup done
+Scheduler config:  SchedulerConfig(runner_type='generate', max_num_batched_tokens=67584, max_num_seqs=64, max_model_len=81920, max_num_partial_prefills=1, max_long_partial_prefills=1, long_prefill_token_threshold=0, num_lookahead_slots=0, cuda_graph_sizes=[128], enable_chunked_prefill=True, is_multimodal_model=False, max_num_encoder_input_tokens=67584, encoder_cache_size=67584, send_delta_data=False, policy='fcfs', chunked_prefill_enabled=True, disable_chunked_mm_input=False, scheduler_cls='vllm.v1.core.sched.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, async_scheduling=False)
+INFO 05-20 13:08:02 [llm.py:310] Supported_tasks: ('generate',)
+warmup...
+Starting batch processing with fixed batch...
+2026-05-20T13:07:59.058647 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:07:59.100448 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+Starting batch processing with fixed batch...
+2026-05-20T13:07:59.738328 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:07:59.954104 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+Starting batch processing with fixed batch...
+2026-05-20T13:08:01.388057 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-20T13:08:03.158274 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+warmup done
+Starting batch processing with fixed batch...
+2026-05-20T13:08:03.308833 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:08:03.350179 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+Starting batch processing with fixed batch...
+2026-05-20T13:08:03.986149 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:08:04.202610 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+Starting batch processing with fixed batch...
+2026-05-20T13:08:05.705473 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-20T13:08:07.481678 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+warmup done
+Starting batch processing with fixed batch...
+2026-05-20T13:08:04.479477 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-20T13:08:09.931418 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  85  L=57344  rep=0  5.65s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:05.884802 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-20T13:08:09.967448 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  80  L=49152  rep=0  4.27s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:05.050980 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-20T13:08:11.888341 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  90  L=65536  rep=0  7.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:10.386379 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-20T13:08:13.294569 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  75  L=40960  rep=0  3.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:12.665012 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-20T13:08:16.737564 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  81  L=49152  rep=1  4.26s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:12.620535 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-20T13:08:18.096403 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  86  L=57344  rep=1  5.69s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:15.956100 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-20T13:08:18.888819 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  76  L=40960  rep=1  3.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:14.527188 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-20T13:08:21.409586 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  91  L=65536  rep=1  7.12s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:19.470080 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-20T13:08:23.545043 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  82  L=49152  rep=2  4.26s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:21.574745 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-20T13:08:24.494058 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  77  L=40960  rep=2  3.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:20.857176 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-20T13:08:26.344939 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  87  L=57344  rep=2  5.69s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:26.968709 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-20T13:08:29.891165 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  78  L=40960  rep=3  3.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:26.089798 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-20T13:08:30.170674 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  83  L=49152  rep=3  4.26s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:23.938071 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-20T13:08:30.815154 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  92  L=65536  rep=2  7.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:28.911915 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-20T13:08:34.380288 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  88  L=57344  rep=3  5.67s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:32.377452 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-20T13:08:35.305741 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  79  L=40960  rep=4  3.08s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:32.699760 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-20T13:08:36.791740 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  84  L=49152  rep=4  4.27s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:36.726201 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+2026-05-20T13:08:38.703137 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+  cell  70  L=32768  rep=0  2.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:38.101648 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-20T13:08:39.660601 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  65  L=28672  rep=0  1.67s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:33.299140 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-20T13:08:40.175355 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  93  L=65536  rep=3  7.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:40.118796 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+2026-05-20T13:08:42.093696 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+  cell  71  L=32768  rep=1  2.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:36.951754 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-20T13:08:42.410983 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  89  L=57344  rep=4  5.66s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:40.947716 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-20T13:08:42.505680 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  66  L=28672  rep=1  1.67s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:43.489647 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20479
+2026-05-20T13:08:44.384005 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20479
+  cell  55  L=20480  rep=0  0.98s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:43.790608 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-20T13:08:45.354196 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  67  L=28672  rep=2  1.67s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:43.517493 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+2026-05-20T13:08:45.503044 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+  cell  72  L=32768  rep=2  2.11s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:45.411014 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-20T13:08:46.306977 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  56  L=20480  rep=1  0.98s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:47.327224 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-20T13:08:48.223902 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  57  L=20480  rep=2  0.98s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:46.652941 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-20T13:08:48.216584 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  68  L=28672  rep=3  1.68s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:46.932480 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-20T13:08:48.909867 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+  cell  73  L=32768  rep=3  2.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:42.687160 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-20T13:08:49.597940 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  94  L=65536  rep=4  7.13s
+
+Wrote 5 cells to /data/projects/AgentScaling/paper/figures/section3/300W/cache_cost_data/shard0
+Starting batch processing with fixed batch...
+2026-05-20T13:08:49.255914 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-20T13:08:50.153926 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  58  L=20480  rep=3  0.99s
+[rank0]:[W520 13:08:50.655807296 ProcessGroupNCCL.cpp:1538] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+Starting batch processing with fixed batch...
+2026-05-20T13:08:49.519593 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-20T13:08:51.081655 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  69  L=28672  rep=4  1.67s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:51.188842 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-20T13:08:52.086027 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  59  L=20480  rep=4  0.98s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:50.337382 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-20T13:08:52.307429 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+  cell  74  L=32768  rep=4  2.09s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:52.008691 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-20T13:08:52.627297 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  50  L=16384  rep=0  0.69s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:52.793926 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-20T13:08:53.100782 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  40  L=10240  rep=0  0.36s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:53.787323 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-20T13:08:54.100299 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  41  L=10240  rep=1  0.37s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:53.557469 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-20T13:08:54.170320 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  51  L=16384  rep=1  0.69s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:53.492787 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+2026-05-20T13:08:54.703318 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+  cell  60  L=24576  rep=0  1.31s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:54.852735 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-20T13:08:55.163547 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  42  L=10240  rep=2  0.37s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:55.208058 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-20T13:08:55.832802 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  52  L=16384  rep=2  0.70s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:55.943552 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-20T13:08:56.256308 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  43  L=10240  rep=3  0.38s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:56.073290 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+2026-05-20T13:08:57.290615 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+  cell  61  L=24576  rep=1  1.33s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:57.041114 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-20T13:08:57.353064 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  44  L=10240  rep=4  0.37s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:56.863363 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-20T13:08:57.492728 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  53  L=16384  rep=3  0.71s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:57.799724 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-20T13:08:57.905951 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  25  L= 4096  rep=0  0.15s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:58.357934 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-20T13:08:58.464369 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  26  L= 4096  rep=1  0.15s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:58.920584 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-20T13:08:59.028319 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  27  L= 4096  rep=2  0.15s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:58.530600 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16383
+2026-05-20T13:08:59.152691 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16383
+  cell  54  L=16384  rep=4  0.70s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:59.473336 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-20T13:08:59.580147 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  28  L= 4096  rep=3  0.15s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:58.629491 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+2026-05-20T13:08:59.840835 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+  cell  62  L=24576  rep=2  1.32s
+Starting batch processing with fixed batch...
+2026-05-20T13:08:59.872274 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:09:00.108570 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  35  L= 8192  rep=0  0.29s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:00.026692 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-20T13:09:00.134043 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  29  L= 4096  rep=4  0.15s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:00.508317 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-20T13:09:00.566272 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  20  L= 2048  rep=0  0.09s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:00.942002 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-20T13:09:00.999679 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  21  L= 2048  rep=1  0.09s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:00.807784 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:09:01.040749 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  36  L= 8192  rep=1  0.29s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:01.371472 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-20T13:09:01.428475 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  22  L= 2048  rep=2  0.09s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:01.800414 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-20T13:09:01.859127 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  23  L= 2048  rep=3  0.10s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:01.733626 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:09:01.965372 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  37  L= 8192  rep=2  0.29s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:02.219857 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-20T13:09:02.274470 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  24  L= 2048  rep=4  0.09s
+
+Wrote 25 cells to /data/projects/AgentScaling/paper/figures/section3/300W/cache_cost_data/shard1
+Starting batch processing with fixed batch...
+2026-05-20T13:09:01.160053 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+2026-05-20T13:09:02.362850 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+  cell  63  L=24576  rep=3  1.31s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:02.601182 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:09:02.831824 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  38  L= 8192  rep=3  0.28s
+[rank0]:[W520 13:09:02.278289942 ProcessGroupNCCL.cpp:1538] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+Starting batch processing with fixed batch...
+2026-05-20T13:09:03.456310 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-20T13:09:03.686451 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  39  L= 8192  rep=4  0.28s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:04.150342 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-20T13:09:04.313222 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  30  L= 6144  rep=0  0.21s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:03.537627 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+2026-05-20T13:09:04.742626 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+  cell  64  L=24576  rep=4  1.30s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:04.769024 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-20T13:09:04.928632 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  31  L= 6144  rep=1  0.20s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:05.392389 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-20T13:09:05.554869 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  32  L= 6144  rep=2  0.21s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:05.530991 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-20T13:09:05.926401 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  45  L=12288  rep=0  0.46s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:06.013458 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-20T13:09:06.174619 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  33  L= 6144  rep=3  0.21s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:06.643023 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-20T13:09:06.804907 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  34  L= 6144  rep=4  0.21s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:07.046598 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:09:07.076282 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  10  L=  512  rep=0  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:06.706891 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-20T13:09:07.102937 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  46  L=12288  rep=1  0.46s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:07.314556 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:09:07.343578 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  11  L=  512  rep=1  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:07.581338 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:09:07.610783 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  12  L=  512  rep=2  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:07.862005 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:09:07.892878 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  13  L=  512  rep=3  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:08.130915 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-20T13:09:08.160278 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  14  L=  512  rep=4  0.06s
+
+Wrote 30 cells to /data/projects/AgentScaling/paper/figures/section3/300W/cache_cost_data/shard2
+Starting batch processing with fixed batch...
+2026-05-20T13:09:07.874913 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-20T13:09:08.268979 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  47  L=12288  rep=2  0.46s
+[rank0]:[W520 13:09:08.176436151 ProcessGroupNCCL.cpp:1538] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+Starting batch processing with fixed batch...
+2026-05-20T13:09:09.031619 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-20T13:09:09.425624 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  48  L=12288  rep=3  0.45s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:10.238208 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-20T13:09:10.642424 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  49  L=12288  rep=4  0.47s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:10.899200 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-20T13:09:10.936072 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  15  L= 1024  rep=0  0.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:11.179663 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-20T13:09:11.216238 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  16  L= 1024  rep=1  0.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:11.459231 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-20T13:09:11.495611 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  17  L= 1024  rep=2  0.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:11.738570 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-20T13:09:11.774892 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  18  L= 1024  rep=3  0.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:12.018038 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-20T13:09:12.054500 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  19  L= 1024  rep=4  0.07s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:12.291340 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-20T13:09:12.320665 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   5  L=  256  rep=0  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:12.555180 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-20T13:09:12.584312 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   6  L=  256  rep=1  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:12.819090 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-20T13:09:12.848077 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   7  L=  256  rep=2  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:13.082119 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-20T13:09:13.111191 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   8  L=  256  rep=3  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:13.345310 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-20T13:09:13.374374 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   9  L=  256  rep=4  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:13.608239 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-20T13:09:13.637088 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   0  L=  128  rep=0  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:13.872729 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-20T13:09:13.901113 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   1  L=  128  rep=1  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:14.135995 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-20T13:09:14.163970 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   2  L=  128  rep=2  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:14.397302 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-20T13:09:14.426644 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   3  L=  128  rep=3  0.06s
+Starting batch processing with fixed batch...
+2026-05-20T13:09:14.664846 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-20T13:09:14.693232 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   4  L=  128  rep=4  0.06s
+
+Wrote 35 cells to /data/projects/AgentScaling/paper/figures/section3/300W/cache_cost_data/shard3
+[rank0]:[W520 13:09:15.698249666 ProcessGroupNCCL.cpp:1538] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+merged 4 shards -> /data/projects/AgentScaling/paper/figures/section3/300W/cache_cost_data  (95 cells)
+=== 2026-05-20T13:09:16-05:00 ALL DONE ===

@@ -1,0 +1,612 @@
+=== 2026-05-19T21:30:25-05:00 starting cache_cost 19-L sweep ===
+INFO 05-19 21:30:29 [__init__.py:216] Automatically detected platform cuda.
+INFO 05-19 21:30:33 [utils.py:233] non-default args: {'download_dir': '/data/projects/AgentScaling/models', 'max_model_len': 81920, 'enable_prefix_caching': True, 'max_num_batched_tokens': 67584, 'max_num_seqs': 64, 'disable_log_stats': True, 'rope_scaling': {'rope_type': 'dynamic', 'factor': 2.5}, 'enforce_eager': True}
+WARNING 05-19 21:30:33 [model.py:371] The global random seed is set to 0. Since VLLM_ENABLE_V1_MULTIPROCESSING is set to False, this may affect the random state of the Python process that launched vLLM.
+INFO 05-19 21:30:33 [model.py:547] Resolved architecture: Qwen3ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 05-19 21:30:33 [model.py:1510] Using max model len 81920
+INFO 05-19 21:30:35 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=67584.
+INFO 05-19 21:30:35 [__init__.py:381] Cudagraph is disabled under eager mode
+No core log file configured
+No core log file configured
+INFO 05-19 21:30:35 [core.py:95] Initializing a V1 LLM engine (v0.11.0) with config: model='Qwen/Qwen3-0.6B', speculative_config=None, tokenizer='Qwen/Qwen3-0.6B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=81920, download_dir='/data/projects/AgentScaling/models', load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=True, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=Qwen/Qwen3-0.6B, enable_prefix_caching=True, chunked_prefill_enabled=True, pooler_config=None, compilation_config={"level":0,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":null,"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"cudagraph_mode":0,"use_cudagraph":true,"cudagraph_num_of_warmups":0,"cudagraph_capture_sizes":[],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"use_inductor_graph_partition":false,"pass_config":{},"max_capture_size":0,"local_cache_dir":null}
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+INFO 05-19 21:30:38 [parallel_state.py:1208] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+WARNING 05-19 21:30:38 [topk_topp_sampler.py:66] FlashInfer is not available. Falling back to the PyTorch-native implementation of top-p & top-k sampling. For the best performance, please install FlashInfer.
+INFO 05-19 21:30:38 [gpu_model_runner.py:2611] Starting to load model Qwen/Qwen3-0.6B...
+INFO 05-19 21:30:39 [gpu_model_runner.py:2643] Loading model from scratch...
+INFO 05-19 21:30:39 [cuda.py:366] Using Flash Attention backend on V1 engine.
+INFO 05-19 21:30:39 [weight_utils.py:392] Using model weights format ['*.safetensors']
+INFO 05-19 21:30:39 [weight_utils.py:450] No model.safetensors.index.json found in remote.
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.95it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  5.94it/s]
+
+INFO 05-19 21:30:39 [default_loader.py:267] Loading weights took 0.22 seconds
+INFO 05-19 21:30:40 [gpu_model_runner.py:2662] Model loading took 1.1365 GiB and 0.510482 seconds
+INFO 05-19 21:30:42 [gpu_worker.py:298] Available KV cache memory: 37.16 GiB
+INFO 05-19 21:30:42 [kv_cache_utils.py:1087] GPU KV cache size: 347,872 tokens
+INFO 05-19 21:30:42 [kv_cache_utils.py:1091] Maximum concurrency for 81,920 tokens per request: 4.25x
+WARNING 05-19 21:30:42 [cudagraph_dispatcher.py:106] cudagraph dispatching keys are not initialized. No cudagraph will be used.
+INFO 05-19 21:30:42 [core.py:228] init engine (profile, create kv cache, warmup model) took 2.22 seconds
+Scheduler config:  SchedulerConfig(runner_type='generate', max_num_batched_tokens=67584, max_num_seqs=64, max_model_len=81920, max_num_partial_prefills=1, max_long_partial_prefills=1, long_prefill_token_threshold=0, num_lookahead_slots=0, cuda_graph_sizes=[128], enable_chunked_prefill=True, is_multimodal_model=False, max_num_encoder_input_tokens=67584, encoder_cache_size=67584, send_delta_data=False, policy='fcfs', chunked_prefill_enabled=True, disable_chunked_mm_input=False, scheduler_cls='vllm.v1.core.sched.scheduler.Scheduler', disable_hybrid_kv_cache_manager=False, async_scheduling=False)
+INFO 05-19 21:30:42 [llm.py:310] Supported_tasks: ('generate',)
+Starting batch processing with fixed batch...
+2026-05-19T21:30:47.899370 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-19T21:30:47.957072 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   0  L=  128  rep=0  0.10s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:48.475633 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-19T21:30:48.513791 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   1  L=  128  rep=1  0.08s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:48.999636 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-19T21:30:49.038554 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   2  L=  128  rep=2  0.08s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:49.515878 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-19T21:30:49.554589 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   3  L=  128  rep=3  0.08s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:49.912525 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+2026-05-19T21:30:49.941041 Fixed batch: Added 1 requests to the engine.
+New request tokens: 127
+  cell   4  L=  128  rep=4  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:54.257902 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-19T21:30:54.285801 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   5  L=  256  rep=0  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:54.627307 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-19T21:30:54.656051 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   6  L=  256  rep=1  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:55.004540 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-19T21:30:55.033370 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   7  L=  256  rep=2  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:55.377290 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-19T21:30:55.406020 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   8  L=  256  rep=3  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:30:55.750086 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+2026-05-19T21:30:55.778812 Fixed batch: Added 1 requests to the engine.
+New request tokens: 255
+  cell   9  L=  256  rep=4  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:00.251367 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-19T21:31:00.281016 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  10  L=  512  rep=0  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:00.638561 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-19T21:31:00.669972 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  11  L=  512  rep=1  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:01.025892 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-19T21:31:01.055498 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  12  L=  512  rep=2  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:01.421542 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-19T21:31:01.450365 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  13  L=  512  rep=3  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:01.824794 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+2026-05-19T21:31:01.853706 Fixed batch: Added 1 requests to the engine.
+New request tokens: 511
+  cell  14  L=  512  rep=4  0.06s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:06.481656 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-19T21:31:06.517569 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  15  L= 1024  rep=0  0.07s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:06.886160 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-19T21:31:06.921698 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  16  L= 1024  rep=1  0.07s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:07.295463 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-19T21:31:07.331023 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  17  L= 1024  rep=2  0.07s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:07.699364 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-19T21:31:07.734960 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  18  L= 1024  rep=3  0.07s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:08.104931 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+2026-05-19T21:31:08.141060 Fixed batch: Added 1 requests to the engine.
+New request tokens: 1023
+  cell  19  L= 1024  rep=4  0.07s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:13.187434 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-19T21:31:13.242718 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  20  L= 2048  rep=0  0.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:13.656017 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-19T21:31:13.710769 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  21  L= 2048  rep=1  0.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:14.117234 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-19T21:31:14.172725 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  22  L= 2048  rep=2  0.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:14.581199 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-19T21:31:14.636027 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  23  L= 2048  rep=3  0.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:15.039733 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+2026-05-19T21:31:15.095403 Fixed batch: Added 1 requests to the engine.
+New request tokens: 2047
+  cell  24  L= 2048  rep=4  0.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:21.009538 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-19T21:31:21.112381 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  25  L= 4096  rep=0  0.14s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:21.606601 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-19T21:31:21.710117 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  26  L= 4096  rep=1  0.14s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:22.329864 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-19T21:31:22.444939 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  27  L= 4096  rep=2  0.17s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:23.118020 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-19T21:31:23.236353 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  28  L= 4096  rep=3  0.17s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:23.907545 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+2026-05-19T21:31:24.017104 Fixed batch: Added 1 requests to the engine.
+New request tokens: 4095
+  cell  29  L= 4096  rep=4  0.16s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:31.109936 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-19T21:31:31.268719 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  30  L= 6144  rep=0  0.20s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:31.850757 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-19T21:31:32.010044 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  31  L= 6144  rep=1  0.20s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:32.586697 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-19T21:31:32.747531 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  32  L= 6144  rep=2  0.21s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:33.328436 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-19T21:31:33.491671 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  33  L= 6144  rep=3  0.21s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:34.085977 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+2026-05-19T21:31:34.245313 Fixed batch: Added 1 requests to the engine.
+New request tokens: 6143
+  cell  34  L= 6144  rep=4  0.20s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:41.867088 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-19T21:31:42.095368 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  35  L= 8192  rep=0  0.28s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:42.759079 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-19T21:31:42.984364 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  36  L= 8192  rep=1  0.28s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:43.653198 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-19T21:31:43.879148 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  37  L= 8192  rep=2  0.28s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:44.561147 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-19T21:31:44.789180 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  38  L= 8192  rep=3  0.28s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:45.466127 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+2026-05-19T21:31:45.692903 Fixed batch: Added 1 requests to the engine.
+New request tokens: 8191
+  cell  39  L= 8192  rep=4  0.28s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:54.137739 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-19T21:31:54.437897 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  40  L=10240  rep=0  0.36s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:55.182898 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-19T21:31:55.486077 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  41  L=10240  rep=1  0.36s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:56.238043 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-19T21:31:56.537951 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  42  L=10240  rep=2  0.36s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:57.284563 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-19T21:31:57.584919 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  43  L=10240  rep=3  0.36s
+Starting batch processing with fixed batch...
+2026-05-19T21:31:58.325663 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+2026-05-19T21:31:58.624973 Fixed batch: Added 1 requests to the engine.
+New request tokens: 10239
+  cell  44  L=10240  rep=4  0.36s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:08.553216 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-19T21:32:08.946796 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  45  L=12288  rep=0  0.46s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:09.798892 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-19T21:32:10.200508 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  46  L=12288  rep=1  0.47s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:11.019189 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-19T21:32:11.411125 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  47  L=12288  rep=2  0.45s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:12.223377 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-19T21:32:12.615093 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  48  L=12288  rep=3  0.45s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:13.454426 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+2026-05-19T21:32:13.848401 Fixed batch: Added 1 requests to the engine.
+New request tokens: 12288
+  cell  49  L=12288  rep=4  0.46s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:24.872271 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-19T21:32:25.486031 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  50  L=16384  rep=0  0.69s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:26.442561 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-19T21:32:27.057862 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  51  L=16384  rep=1  0.69s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:27.978854 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-19T21:32:28.595754 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  52  L=16384  rep=2  0.69s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:29.538819 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+2026-05-19T21:32:30.153748 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16384
+  cell  53  L=16384  rep=3  0.69s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:31.148347 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16383
+2026-05-19T21:32:31.761201 Fixed batch: Added 1 requests to the engine.
+New request tokens: 16383
+  cell  54  L=16384  rep=4  0.69s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:45.142979 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20479
+2026-05-19T21:32:46.022524 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20479
+  cell  55  L=20480  rep=0  0.97s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:47.166996 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-19T21:32:48.050302 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  56  L=20480  rep=1  0.97s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:49.202540 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-19T21:32:50.090340 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  57  L=20480  rep=2  0.99s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:51.285656 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-19T21:32:52.172986 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  58  L=20480  rep=3  0.98s
+Starting batch processing with fixed batch...
+2026-05-19T21:32:53.324506 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+2026-05-19T21:32:54.212115 Fixed batch: Added 1 requests to the engine.
+New request tokens: 20480
+  cell  59  L=20480  rep=4  0.97s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:08.667927 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+2026-05-19T21:33:09.889774 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+  cell  60  L=24576  rep=0  1.32s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:11.172285 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+2026-05-19T21:33:12.379986 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24576
+  cell  61  L=24576  rep=1  1.31s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:14.102110 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+2026-05-19T21:33:15.345422 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+  cell  62  L=24576  rep=2  1.37s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:16.710101 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+2026-05-19T21:33:17.910272 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+  cell  63  L=24576  rep=3  1.30s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:19.205157 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+2026-05-19T21:33:20.411556 Fixed batch: Added 1 requests to the engine.
+New request tokens: 24575
+  cell  64  L=24576  rep=4  1.31s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:36.508145 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-19T21:33:38.071233 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  65  L=28672  rep=0  1.67s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:39.541156 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-19T21:33:41.099520 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  66  L=28672  rep=1  1.67s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:42.545040 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-19T21:33:44.103259 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  67  L=28672  rep=2  1.67s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:45.562194 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-19T21:33:47.121023 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  68  L=28672  rep=3  1.67s
+Starting batch processing with fixed batch...
+2026-05-19T21:33:48.587702 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+2026-05-19T21:33:50.181047 Fixed batch: Added 1 requests to the engine.
+New request tokens: 28672
+  cell  69  L=28672  rep=4  1.72s
+Starting batch processing with fixed batch...
+2026-05-19T21:34:08.498152 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+2026-05-19T21:34:10.462845 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+  cell  70  L=32768  rep=0  2.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:34:12.079505 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+2026-05-19T21:34:14.047989 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+  cell  71  L=32768  rep=1  2.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:34:15.669621 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+2026-05-19T21:34:17.638052 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32767
+  cell  72  L=32768  rep=2  2.11s
+Starting batch processing with fixed batch...
+2026-05-19T21:34:19.240171 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-19T21:34:21.214762 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+  cell  73  L=32768  rep=3  2.10s
+Starting batch processing with fixed batch...
+2026-05-19T21:34:22.816696 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+2026-05-19T21:34:24.787955 Fixed batch: Added 1 requests to the engine.
+New request tokens: 32768
+  cell  74  L=32768  rep=4  2.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:34:56.855003 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-19T21:34:59.777881 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  75  L=40960  rep=0  3.08s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:02.264230 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-19T21:35:05.225897 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  76  L=40960  rep=1  3.12s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:08.250719 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-19T21:35:11.183294 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  77  L=40960  rep=2  3.08s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:13.724149 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-19T21:35:16.662899 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  78  L=40960  rep=3  3.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:19.197188 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+2026-05-19T21:35:22.136977 Fixed batch: Added 1 requests to the engine.
+New request tokens: 40960
+  cell  79  L=40960  rep=4  3.09s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:24.678340 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-19T21:35:28.763509 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  80  L=49152  rep=0  4.26s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:31.318771 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-19T21:35:35.414719 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  81  L=49152  rep=1  4.28s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:37.951157 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-19T21:35:42.071324 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  82  L=49152  rep=2  4.30s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:44.904970 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-19T21:35:48.988127 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  83  L=49152  rep=3  4.26s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:51.554961 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+2026-05-19T21:35:55.649303 Fixed batch: Added 1 requests to the engine.
+New request tokens: 49152
+  cell  84  L=49152  rep=4  4.27s
+Starting batch processing with fixed batch...
+2026-05-19T21:35:58.223597 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-19T21:36:03.659958 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  85  L=57344  rep=0  5.64s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:06.261965 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-19T21:36:11.707022 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  86  L=57344  rep=1  5.65s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:14.295018 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-19T21:36:19.782767 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  87  L=57344  rep=2  5.70s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:22.386984 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-19T21:36:27.848895 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  88  L=57344  rep=3  5.66s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:30.435103 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+2026-05-19T21:36:35.906036 Fixed batch: Added 1 requests to the engine.
+New request tokens: 57344
+  cell  89  L=57344  rep=4  5.67s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:38.356986 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-19T21:36:45.360122 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  90  L=65536  rep=0  7.23s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:47.815677 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-19T21:36:54.882008 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  91  L=65536  rep=1  7.30s
+Starting batch processing with fixed batch...
+2026-05-19T21:36:57.946755 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-19T21:37:04.966682 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  92  L=65536  rep=2  7.25s
+Starting batch processing with fixed batch...
+2026-05-19T21:37:07.429935 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-19T21:37:14.468454 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  93  L=65536  rep=3  7.27s
+Starting batch processing with fixed batch...
+2026-05-19T21:37:16.927181 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+2026-05-19T21:37:23.970159 Fixed batch: Added 1 requests to the engine.
+New request tokens: 65536
+  cell  94  L=65536  rep=4  7.28s
+
+Wrote 95 cells to /data/projects/AgentScaling/paper/figures/section3/300W/cache_cost_data
+[rank0]:[W519 21:37:24.052885968 ProcessGroupNCCL.cpp:1538] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+=== 2026-05-19T21:37:25-05:00 exit code 0 ===

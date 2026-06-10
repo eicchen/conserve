@@ -1,0 +1,16 @@
+# Marker file: presence of this file marks the root of the conserve repo.
+#
+# Every script in this repo discovers REPO_ROOT by walking up from its own
+# location until it finds this marker:
+#
+#   from pathlib import Path
+#   REPO_ROOT = next(p for p in Path(__file__).resolve().parents
+#                    if (p / ".conserve_root").exists())
+#
+# Output / data paths are then constructed as `REPO_ROOT / "..." / "..."`,
+# so the repo can be moved or cloned anywhere on disk without script edits.
+#
+# Top-level layout:
+#   conserve/    — experiment runner, scheduler, vLLM integration
+#   paper/       — figure-generating scripts and rendered outputs
+#   profiling/   — micro-benchmark scripts (decode grid, interference, etc.)

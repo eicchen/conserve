@@ -1,0 +1,79 @@
+# =============================================================================
+# Experimental result files. Raw outputs are intentionally kept OUT of the
+# git repo and stored externally (e.g. /data/projects/AgentScaling/
+# conserve_output_backup/). The patterns below make sure they don't sneak
+# back in if anyone re-runs an experiment from a fresh clone.
+# =============================================================================
+
+# All per-cell experiment output produced by profile_1pxd.sh / run_sweep.sh /
+# rerun_cell.sh. Each cell dir contains raw vllm logs (engine + core jsonl),
+# the dcgmi trace, and a small per_step_latency.csv summary. Keep only the
+# notebooks and the helper Python script at the top level.
+conserve/output/*
+!conserve/output/*.ipynb
+!conserve/output/*.py
+
+# Section-3 raw profiling data (decode grids, prefill linearity, etc.).
+# Moved to conserve_output_backup/profiling.
+paper/figures/section3/output/200W/
+paper/figures/section3/output/300W/
+
+# Plot pipeline caches (auto-regenerated from the raw runs).
+paper/figures/section5/cache/
+
+# External input data — distributed out-of-band, not in git.
+# The serving experiments read these from conserve/input/ — see the README
+# for download instructions.
+conserve/input/mini_swe_agent_trace.json
+conserve/input/compound_prompts.json
+
+# =============================================================================
+# In case anyone re-runs experiments and leaves byproducts in the repo,
+# defensive patterns for individual artifact types:
+# =============================================================================
+
+# Raw vLLM engine + core logs (every cell, every engine).
+*_vllm_engine_log.jsonl
+*_vllm_core_log.jsonl
+
+# Section-3 profiling sweeps use a different naming scheme.
+cell_*_engine.jsonl
+cell_*_core.jsonl
+
+# dcgmi GPU power / energy traces (~100-300 MB per cell).
+dcgmi_trace.tsv
+
+# Synthetic prefiller traces emitted by AMPD runs (modeled, not measured).
+synthetic_prefiller_per_step_latency.csv
+
+# Per-cell run.log written by profile_1pxd.sh.
+run.log
+
+# Overnight orchestrator logs.
+overnight*.log
+*_overnight.log
+*_refill.log
+*_fill.log
+*_sweep_d*.log
+all_disagg_*.log
+
+# =============================================================================
+# Standard junk.
+# =============================================================================
+
+# Python build artifacts.
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Jupyter checkpoints.
+.ipynb_checkpoints/
+
+# Editor / OS detritus.
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

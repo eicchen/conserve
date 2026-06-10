@@ -1,0 +1,14 @@
+local_cpu: False
+
+enable_pd: True
+transfer_channel: "nixl"
+pd_role: "receiver"
+pd_peer_host: "localhost"
+pd_peer_init_port: 7300
+pd_peer_alloc_port: 7400
+pd_buffer_size: 8455716864 # ~8GB (288 * 28 MiB, Qwen3-0.6B aligned, fits ~2x L=32768 transfers)
+# pd_buffer_size: 5284823040 # ~5GB
+# pd_buffer_size: 2143289344 # ~2GB
+# pd_buffer_size: 2147483648 # 2GB (non-aligned for Qwen3-0.6B, fails assertion)
+pd_buffer_device: "cuda"
+nixl_backends: [UCX]
