@@ -246,9 +246,13 @@ forgotten cap change will not silently mislabel output.
 If you use this code, please cite the ConServe paper:
 
 ```
-TODO: BibTeX entry once the paper is published
+@misc{conserve,
+      title={Observation, Not Prediction: Conversation-Level Disaggregated Scheduling for Agentic Serving}, 
+      author={Jianru Ding and Ryien Hosseini and Pouya Mahdi Gholami and Mingyuan Xiang and Henry Hoffmann},
+      year={2026},
+      eprint={2606.01839},
+      archivePrefix={arXiv},
+      primaryClass={cs.DC},
+      url={https://arxiv.org/abs/2606.01839}, 
+}
 ```
-
-## License
-
-TODO
