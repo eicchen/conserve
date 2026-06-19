@@ -21,7 +21,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
 MODEL="Qwen/Qwen3-0.6B"
-MODEL_DIR="/data/projects/AgentScaling/models"
+source "$SCRIPT_DIR/../config.sh"
 MAX_NUM_BATCHED_TOKENS=2944
 
 ensure_arg_exists() {

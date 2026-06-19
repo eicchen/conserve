@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-GPU_MON_ROOT = Path("/data/projects/AgentScaling/gpu_monitoring")  # external data dir; outside the conserve repo
+from paths import MODEL_DIR, PROFILING_DATA_DIR, GPU_MON_ROOT
 
 import time
 
@@ -26,14 +26,14 @@ args = parser.parse_args()
 in_token_size = args.in_token_size
 out_token_size = 2
 batch_size = args.batch_size
-in_dir = Path("/data/projects/AgentScaling/data/profiling/")
+in_dir = Path(PROFILING_DATA_DIR)
 out_dir = Path(f"{GPU_MON_ROOT}/{MODEL_PATH.split('/')[-1]}/prefill_8192_81920/{batch_size}")
 # out_dir = Path(f"{GPU_MON_ROOT}/{MODEL_PATH.split('/')[-1]}/test")
 
 LLM_ARGS = {
     'model': MODEL_PATH,
     'dtype': "auto",
-    'download_dir': "/data/projects/AgentScaling/models",
+    'download_dir': MODEL_DIR,
     'rope_scaling': {"rope_type": "dynamic", "factor": 2.0},
     'max_num_batched_tokens': 81920,
     'max_num_seqs': 1024,

@@ -22,6 +22,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+from paths import MODEL_DIR, PROFILING_DATA_DIR
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -60,12 +61,12 @@ def build_prompt(cell_idx: int, L: int, tokenizer) -> str:
     L in {40960, 49152, 57344} have no dedicated prompt file; fall back to
     truncating a prompts_65536x2048.json prompt to the first L tokens.
     """
-    p = Path(f"/data/projects/AgentScaling/data/profiling/prompts_{L}x2048.json")
+    p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
     if p.exists():
         with open(p) as f:
             prompts = json.load(f)
         return prompts[cell_idx % len(prompts)]["prompt"]
-    src = Path("/data/projects/AgentScaling/data/profiling/prompts_65536x2048.json")
+    src = Path(f"{PROFILING_DATA_DIR}/prompts_65536x2048.json")
     with open(src) as f:
         prompts = json.load(f)
     text = prompts[cell_idx % len(prompts)]["prompt"]
@@ -77,7 +78,7 @@ def main():
     llm = LLM(
         model=MODEL,
         dtype="auto",
-        download_dir="/data/projects/AgentScaling/models",
+        download_dir=MODEL_DIR,
         rope_scaling={"rope_type": "dynamic", "factor": 2.5},
         max_num_batched_tokens=67584,
         max_num_seqs=64,

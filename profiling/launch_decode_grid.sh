@@ -14,6 +14,7 @@
 _d="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 while [ "$_d" != "/" ] && [ ! -e "$_d/.conserve_root" ]; do _d="$(dirname "$_d")"; done
 REPO_ROOT="$_d"
+source "$REPO_ROOT/config.sh"
 
 set -euo pipefail
 

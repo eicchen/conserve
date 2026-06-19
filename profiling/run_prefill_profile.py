@@ -19,6 +19,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+from paths import MODEL_DIR, PROFILING_DATA_DIR
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -47,9 +48,9 @@ def load_prompts(L: int, tokenizer):
     first L tokens of the 65536 prompts.
     """
     if L in HAVE_FILES:
-        p = Path(f"/data/projects/AgentScaling/data/profiling/prompts_{L}x2048.json")
+        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
         return [d["prompt"] for d in json.loads(p.read_text())[:N_PROMPTS_PER_L]]
-    src = json.loads(Path("/data/projects/AgentScaling/data/profiling/prompts_65536x2048.json").read_text())
+    src = json.loads(Path(f"{PROFILING_DATA_DIR}/prompts_65536x2048.json").read_text())
     out = []
     for d in src[:N_PROMPTS_PER_L]:
         ids = tokenizer.encode(d["prompt"], add_special_tokens=False)[:L]
@@ -71,7 +72,7 @@ def main():
     llm = LLM(
         model=MODEL,
         dtype="auto",
-        download_dir="/data/projects/AgentScaling/models",
+        download_dir=MODEL_DIR,
         rope_scaling={"rope_type": "dynamic", "factor": ROPE_FACTOR},
         max_num_batched_tokens=max(L_VALUES) + 2048,
         max_num_seqs=4,

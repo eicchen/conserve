@@ -18,7 +18,8 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-GPU_MON_ROOT = Path("/data/projects/AgentScaling/gpu_monitoring")  # external data dir; outside the conserve repo
+import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
+from paths import GPU_MON_ROOT
 
 
 import numpy as np

@@ -38,7 +38,7 @@ if [[ $1 == "prefiller" ]]; then
         vllm serve $MODEL \
         --port 7100 \
         --trust-remote-code \
-        --download-dir /data/projects/AgentScaling/models \
+        --download-dir "$MODEL_DIR" \
         --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
         --max-num-batched-tokens $PREFILLER_MAX_NUM_BATCHED_TOKENS \
         --max-num-seqs 1024 \
@@ -64,7 +64,7 @@ elif [[ $1 == "decoder" ]]; then
         CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
         vllm serve $MODEL \
         --port 7200 \
-        --download-dir /data/projects/AgentScaling/models \
+        --download-dir "$MODEL_DIR" \
         --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
         --max-num-batched-tokens $MAX_NUM_BATCHED_TOKENS \
         --max-num-seqs 1024 \
@@ -89,7 +89,7 @@ elif [[ $1 == "decoder1" ]]; then
         CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
         vllm serve $MODEL \
         --port 7200 \
-        --download-dir /data/projects/AgentScaling/models \
+        --download-dir "$MODEL_DIR" \
         --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
         --max-num-batched-tokens $MAX_NUM_BATCHED_TOKENS \
         --max-num-seqs 1024 \
@@ -114,7 +114,7 @@ elif [[ $1 == "decoder2" ]]; then
         CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
         vllm serve $MODEL \
         --port 7201 \
-        --download-dir /data/projects/AgentScaling/models \
+        --download-dir "$MODEL_DIR" \
         --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
         --max-num-batched-tokens $MAX_NUM_BATCHED_TOKENS \
         --max-num-seqs 1024 \
@@ -137,7 +137,7 @@ elif [[ $1 == "decoder3" ]]; then
         CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
         vllm serve $MODEL \
         --port 7202 \
-        --download-dir /data/projects/AgentScaling/models \
+        --download-dir "$MODEL_DIR" \
         --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
         --max-num-batched-tokens $MAX_NUM_BATCHED_TOKENS \
         --max-num-seqs 1024 \

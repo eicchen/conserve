@@ -34,6 +34,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+from paths import MODEL_DIR, PROFILING_DATA_DIR
 
 
 import aiohttp
@@ -72,7 +73,7 @@ def start_server():
         "vllm", "serve", MODEL,
         "--host", "localhost",
         "--port", str(PORT),
-        "--download-dir", "/data/projects/AgentScaling/models",
+        "--download-dir", MODEL_DIR,
         "--rope-scaling", '{"rope_type":"dynamic","factor":2.0}',
         "--max-num-batched-tokens", "33792",
         "--max-num-seqs", "128",
@@ -121,7 +122,7 @@ _PROMPT_CACHE: dict = {}
 def load_prompts(L: int):
     """Load the prompts_{L}x2048.json file (cached across calls)."""
     if L not in _PROMPT_CACHE:
-        p = Path(f"/data/projects/AgentScaling/data/profiling/prompts_{L}x2048.json")
+        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
         with open(p) as f:
             _PROMPT_CACHE[L] = json.load(f)
     return _PROMPT_CACHE[L]
@@ -223,7 +224,7 @@ async def main():
     # (the server hasn't started yet, and we want this offline).
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(
-        MODEL, cache_dir="/data/projects/AgentScaling/models", trust_remote_code=True,
+        MODEL, cache_dir=MODEL_DIR, trust_remote_code=True,
     )
 
     # Start server

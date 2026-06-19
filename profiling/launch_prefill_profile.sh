@@ -6,6 +6,7 @@
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../config.sh"
 PY="${PY:-$(which python3)}"
 
 # Static LPT assignment (computed offline based on expected per-L runtimes at 300W).

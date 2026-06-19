@@ -33,6 +33,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+from paths import MODEL_DIR, PROFILING_DATA_DIR
 
 
 import aiohttp
@@ -72,7 +73,7 @@ _PROMPTS_CACHE: dict = {}
 
 def load_prompts(L: int):
     if L not in _PROMPTS_CACHE:
-        p = Path(f"/data/projects/AgentScaling/data/profiling/prompts_{L}x2048.json")
+        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
         with open(p) as f:
             _PROMPTS_CACHE[L] = json.load(f)
     return _PROMPTS_CACHE[L]
@@ -93,7 +94,7 @@ def start_server():
         "vllm", "serve", MODEL,
         "--host", "localhost",
         "--port", str(PORT),
-        "--download-dir", "/data/projects/AgentScaling/models",
+        "--download-dir", MODEL_DIR,
         "--rope-scaling", '{"rope_type":"dynamic","factor":2.0}',
         "--max-num-batched-tokens", "33792",
         "--max-num-seqs", "32",

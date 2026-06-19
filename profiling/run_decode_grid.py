@@ -31,6 +31,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+from paths import MODEL_DIR, PROFILING_DATA_DIR
 
 
 from vllm import LLM, SamplingParams
@@ -56,7 +57,7 @@ _PROMPTS_CACHE: dict = {}
 
 def load_prompts(L: int):
     if L not in _PROMPTS_CACHE:
-        p = Path(f"/data/projects/AgentScaling/data/profiling/prompts_{L}x2048.json")
+        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
         with open(p) as f:
             _PROMPTS_CACHE[L] = json.load(f)
     return _PROMPTS_CACHE[L]
@@ -153,7 +154,7 @@ def main():
     llm = LLM(
         model=MODEL,
         dtype="auto",
-        download_dir="/data/projects/AgentScaling/models",
+        download_dir=MODEL_DIR,
         rope_scaling={"rope_type": "dynamic", "factor": ROPE_FACTOR},
         max_num_batched_tokens=MAX_TOK,
         max_num_seqs=MAX_SEQS,
