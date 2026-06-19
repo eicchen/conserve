@@ -6,7 +6,7 @@
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PY="/data/projects/jerry/conda/envs/agent-scaling/bin/python3"
+PY="${PY:-$(which python3)}"
 
 # Static LPT assignment (computed offline based on expected per-L runtimes at 300W).
 # Each line: GPU_id   L1,L2,...

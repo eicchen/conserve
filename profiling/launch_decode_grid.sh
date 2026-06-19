@@ -18,7 +18,7 @@ REPO_ROOT="$_d"
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PY="/data/projects/jerry/conda/envs/agent-scaling/bin/python3"
+PY="${PY:-$(which python3)}"
 OUT_DIR="${OUT_DIR:-$REPO_ROOT/paper/figures/section3/output/300W/decode_grid_data}"
 # Override GPUS env to control which GPUs to use (space-separated list).
 # Default uses all 4. Set GPUS="1 2 3" to skip GPU 0.

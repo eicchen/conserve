@@ -64,7 +64,7 @@ while [ "$_d" != "/" ] && [ ! -e "$_d/.conserve_root" ]; do _d="$(dirname "$_d")
 REPO_ROOT="$_d"
 PROJECT="$REPO_ROOT/conserve"
 
-export PATH=/data/projects/jerry/conda/envs/agent-scaling/bin:$PATH
+export PATH="$(dirname "$(which python3)"):$PATH"
 export PREFILLER_DEVICE_ID=0
 export DECODER_DEVICE_IDS=1,2,3
 export MAX_ITERS=${MAX_ITERS:-5}

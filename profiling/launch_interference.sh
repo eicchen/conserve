@@ -11,7 +11,7 @@ REPO_ROOT="$_d"
 
 set -u
 cd "$(dirname "${BASH_SOURCE[0]}")"
-export PATH=/data/projects/jerry/conda/envs/agent-scaling/bin:$PATH
+export PATH="$(dirname "$(which python3)"):$PATH"
 export TMPDIR=/tmp
 
 SEC3=$REPO_ROOT/paper/figures/section3/output/300W

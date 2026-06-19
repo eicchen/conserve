@@ -67,7 +67,7 @@ def start_server():
     env = os.environ.copy()
     env["TMPDIR"] = "/tmp"
     env["VLLM_ENABLE_V1_MULTIPROCESSING"] = "1"
-    env["PATH"] = "/data/projects/jerry/conda/envs/agent-scaling/bin:" + env.get("PATH", "")
+    env["PATH"] = os.path.dirname(sys.executable) + ":" + env.get("PATH", "")
     cmd = [
         "vllm", "serve", MODEL,
         "--host", "localhost",
