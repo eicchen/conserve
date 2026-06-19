@@ -27,6 +27,10 @@ paper/figures/section5/cache/
 conserve/input/mini_swe_agent_trace.json
 conserve/input/compound_prompts.json
 
+# log files and data set
+conserve/logs/*
+conserve/datasets/*
+
 # =============================================================================
 # In case anyone re-runs experiments and leaves byproducts in the repo,
 # defensive patterns for individual artifact types:
