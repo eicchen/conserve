@@ -29,6 +29,8 @@ import sys
 import time
 from pathlib import Path
 
+import torch.distributed as dist
+
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 from paths import MODEL_DIR, PROFILING_DATA_DIR
@@ -230,6 +232,8 @@ def main():
                 dcgmi_proc.wait(timeout=5)
             except Exception as e:
                 print(f"dcgmi cleanup: {e}")
+        if dist.is_available() and dist.is_initialized():
+            dist.destroy_process_group()
 
 
 if __name__ == "__main__":
