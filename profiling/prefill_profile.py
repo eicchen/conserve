@@ -8,13 +8,13 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from paths import MODEL_DIR, PROFILING_DATA_DIR, GPU_MON_ROOT
+from paths import MODEL_DIR, PROFILING_DATA_DIR, GPU_MON_ROOT, MODEL
 
 import time
 
 
-# MODEL_PATH = "meta-llama/Meta-Llama-3-8B-Instruct"
-MODEL_PATH = "Qwen/Qwen3-0.6B"
+# MODEL_PATH = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
+MODEL_PATH = MODEL
 
 import argparse
 

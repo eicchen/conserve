@@ -33,12 +33,12 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from paths import MODEL_DIR, PROFILING_DATA_DIR
+from paths import MODEL_DIR, PROFILING_DATA_DIR, MODEL
 
 
 import aiohttp
 
-MODEL = "Qwen/Qwen3-0.6B"
+# MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
 
 # Shard-aware: each shard runs a strided subset of the replicates on its own
 # GPU/port/output dir, so the 3 free GPUs can run in parallel. Merge afterward.

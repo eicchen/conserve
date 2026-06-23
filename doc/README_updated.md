@@ -64,6 +64,7 @@ are large and easy to regenerate or host externally:
 |---|---|---|
 | `conserve/input/mini_swe_agent_trace.json` | ~162 MB | per-conversation prompt + token-size trace, derived from running mini-swe-agent over SWE-bench bm25_13K |
 | `conserve/input/compound_prompts.json` | ~1.5 MB | Project-Gutenberg-padded compound prefix prompts (used by all scheduler runners to defeat prefix caching) |
+| `PROFILING_DATA_DIR/prompts_*x2048.json` | ~2.5 GB total | pre-tokenized prompt files for each prefill length (128–65536 tokens); required by `profiling/run_prefill_profile.py`. Default path: `/data/projects/AgentScaling/data/profiling/`. Override with `PROFILING_DATA_DIR` env var. Obtain from maintainers or regenerate with `profiling/generate_long_prompts.py`. |
 
 **To obtain them**, ask the maintainers (or, if you want to regenerate from
 scratch):

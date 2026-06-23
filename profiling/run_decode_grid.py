@@ -33,12 +33,12 @@ import torch.distributed as dist
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from paths import MODEL_DIR, PROFILING_DATA_DIR
+from paths import MODEL_DIR, PROFILING_DATA_DIR, MODEL
 
 
 from vllm import LLM, SamplingParams
 
-MODEL = "Qwen/Qwen3-0.6B"
+# MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
 DEFAULT_OUT_DIR = (REPO_ROOT / "paper/figures/section3/output/300W/decode_grid_data")
 
 B_VALUES = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128]

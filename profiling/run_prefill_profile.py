@@ -19,13 +19,13 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from paths import MODEL_DIR, PROFILING_DATA_DIR
+from paths import MODEL_DIR, PROFILING_DATA_DIR, MODEL
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
 from vllm import LLM, SamplingParams
 
-MODEL = "Qwen/Qwen3-0.6B"
+# MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
 OUT = (REPO_ROOT / "paper/figures/section3/output/300W/prefill_profile_data")
 OUT.mkdir(parents=True, exist_ok=True)
 
