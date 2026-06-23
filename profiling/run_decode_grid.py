@@ -33,7 +33,7 @@ import torch.distributed as dist
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from paths import MODEL_DIR, PROFILING_DATA_DIR, MODEL
+from config import MODEL_DIR, PROFILING_DATA_DIR, MODEL
 
 
 from vllm import LLM, SamplingParams

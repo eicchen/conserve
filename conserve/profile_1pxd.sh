@@ -19,8 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Switch to the directory of the current script
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
-MODEL="Qwen/Qwen3-0.6B"
+# To switch models, edit config.env at the repo root (or set MODEL= before running).
 source "$SCRIPT_DIR/../config.sh"
 MAX_NUM_BATCHED_TOKENS=2944
 

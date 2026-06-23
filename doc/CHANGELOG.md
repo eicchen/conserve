@@ -113,6 +113,83 @@ All `AgentScaling/` paths moved to two global config files — override with env
 
 ---
 
+## `config.env` — single source of truth for all global config
+
+Introduced `config.env` at the repo root as the single canonical config file read
+by both the shell and Python sides. Renamed `profiling/paths.py` → `profiling/config.py`
+to reflect its broader role.
+
+### What changed
+
+- **`config.env`** (new) — defines `MODEL`, `MODEL_DIR`, `PROFILING_DATA_DIR`,
+  `GPU_MON_ROOT`. Relative path defaults resolve from the repo root, so the repo
+  works out of the box on a new machine without editing any script. To switch models,
+  edit the `MODEL=` line here (or set `MODEL=` before running any script).
+- **`config.sh`** — rewritten to parse `config.env` instead of hardcoding defaults.
+  Now self-computes `REPO_ROOT` from its own location, so callers no longer need to
+  pre-set it. Resolves relative paths against `REPO_ROOT` before exporting.
+  Env vars already set in the caller's environment take precedence over `config.env`.
+- **`profiling/config.py`** (renamed from `paths.py`) — same precedence logic as
+  `config.sh`: env var → `config.env` → built-in fallback. Relative paths resolved
+  against the repo root via `Path(__file__).parent.parent`.
+- **`profiling/paths.py`** — deleted; all imports updated to `from config import`.
+- **`conserve/profile_1pxd.sh`** — removed inline `MODEL=` definition; model now
+  comes from `config.env` via `config.sh`.
+
+### Files with updated imports (11 total)
+`profiling/decode_profile.py`, `profiling/prefill_profile.py`,
+`profiling/run_cache_cost.py`, `profiling/run_decode_grid.py`,
+`profiling/run_interference.py`, `profiling/run_interference_kv.py`,
+`profiling/run_prefill_profile.py`,
+`paper/figures/section3/scripts/plot_decode_flat.py`,
+`paper/figures/section3/scripts/plot_decode_knee.py`,
+`paper/figures/section3/scripts/plot_decode_step_drift.py`,
+`paper/figures/section3/scripts/plot_network_overhead.py`
+
+## Known issues / remaining hardcodes
+
+Items that are still hardcoded or lack a single source of truth:
+
+- **Section 3 plot scripts — model name baked into directory paths.**
+  Four scripts build data paths using the literal string `"Qwen3-0.6B"` as a
+  subdirectory component under `GPU_MON_ROOT` (e.g. `GPU_MON_ROOT / "Qwen3-0.6B/decode"`).
+  Affected files: `plot_decode_flat.py:29`, `plot_decode_knee.py:29`,
+  `plot_decode_step_drift.py:31`, `plot_network_overhead.py:39`.
+  These cannot be derived from `MODEL` because the on-disk directory names were
+  created with the literal suffix. A model swap requires renaming the output
+  directories and updating these four paths.
+
+- **`conserve/src/profile_agent.py:25` — hardcoded `ENGINE` URL separate from argparse default.**
+  `ENGINE = "http://127.0.0.1:9101"` is set at module level independently of the
+  `--proxy-port` argparse default (also 9101) on line 115. The two are not linked;
+  changing the port requires updating both.
+
+- **`300W` hardcoded as the Section 3 output subdirectory.**
+  Default output paths in `run_decode_grid.py`, `run_prefill_profile.py`,
+  `run_interference.py`, and `run_interference_kv.py` all resolve to
+  `paper/figures/section3/output/300W/…`. Plot scripts read from the same path.
+  Running Section 3 experiments at a different power cap requires overriding
+  `--out-dir` / `--dir` on every script and updating the plot script paths manually.
+
+- **Ports have no single source of truth.**
+  Ports 7100 (prefiller), 7200–7202 (decoders), 9101 (disagg proxy) are repeated
+  as defaults in `profile_1pxd.sh`, `disagg_vllm_launcher.sh`, `main.py`, and
+  `profile_agent.py`. All four files must be updated in sync if ports change.
+
+- **NCCL `destroy_process_group` warning on vLLM server shutdown.**
+  After `profile_1pxd.sh` exits, one warning per vLLM server appears:
+  ```
+  [rank0]:[W ProcessGroupNCCL.cpp:1538] WARNING: destroy_process_group() was not
+  called before program exit, which can leak resources.
+  ```
+  Root cause: `MultiprocExecutor.shutdown()` closes the death pipe (signalling
+  workers to begin their `finally` cleanup) and then immediately calls
+  `p.terminate()` (SIGTERM). If SIGTERM arrives while `destroy_model_parallel()`
+  or `destroy_distributed_environment()` is executing, Python's signal handler
+  raises `SystemExit`, escaping the `finally` block before
+  `torch.distributed.destroy_process_group()` is called. Cosmetic only — does not
+  affect experiment data or exit codes.
+
 ## Missing files / documentation gaps
 
 Items required to run the project that are not yet documented or present in this fork:
