@@ -1,5 +1,86 @@
 # Changelog
 
+## Multi-model support for Section 3 figure scripts
+
+- **`profiling/config.py`**: Added `MODEL_SHORT = MODEL.split("/")[-1]` (e.g. `Qwen3.6-27B` from `Qwen/Qwen3.6-27B`).
+- **`paper/figures/section3/scripts/` (all 10 plot scripts)**: Output directories changed from the hardcoded `output/300W/` (or `output/200W/`) to `output/<MODEL_SHORT>/300W/` (and `output/<MODEL_SHORT>/200W/`). Figures from different models now land in separate subdirectories instead of overwriting each other.
+- **`plot_network_overhead.py`** and **`plot_decode_step_drift.py`**: Input data paths in `GPU_MON_ROOT` were hardcoded to `Qwen3-0.6B/…`; now use `MODEL_SHORT` so the scripts read from the correct model's monitoring directory.
+- **`plot_prefill_linearity.py`** and **`plot_prefill_with_cache.py`**: These two scripts had no `REPO_ROOT` or config import; added both, replacing `Path(__file__).parent.parent` relative paths with explicit `REPO_ROOT`-anchored paths.
+- **`plot_prefill_linearity.py`**: Hardcoded model name in `prefill_linearity_fit.txt` output replaced with `MODEL_SHORT`.
+- No changes to `plot_trace.py` (workload-distribution plot; not model-specific).
+
+## Benchmark switching: dynamic OUTPUT_DIR and WORKFLOW.md section
+
+- **`input/mini_agent_test.py`**: `OUTPUT_DIR` is now derived from `DATASET_NAME.split("/")[-1]` so outputs never collide when switching benchmarks. Added commented-out entries for three planned datasets (`ScaleAI/SWE-bench_Pro`, `harborframework/terminal-bench-2.0`, `livecodebench/code_generation`) with HuggingFace links.
+- **`doc/WORKFLOW.md`**: Added "Switching benchmarks" section (before Part 2) documenting the one-line swap, the four planned datasets, and the column-name caveat for new benchmarks.
+
+## 2026-06-23 — WORKFLOW.md: factual corrections from repository audit
+
+Audited every Part 3 command and §1.2 prereqs against the actual scripts; fixed
+seven factual errors:
+
+- **Part 3 — missing `run_cache_cost.py` step**: this script generates
+  `cache_cost_data/` (prefix-cache hit-vs-miss latency) which feeds into
+  `per_turn_cost_model.py`. It was not mentioned at all. Added as an explicit
+  step after the three launch scripts.
+- **Removed stale `merge_cache_cost_shards.py` no-arg call**: requires
+  `<base_dir> <n_shards>` arguments; calling it bare would fail. Documented the
+  correct sharded invocation inline in a comment next to `run_cache_cost.py`.
+- **Removed redundant `merge_interference_shards.py` call**: `launch_interference.sh`
+  already invokes it internally at the end of each phase; calling it again
+  separately is a no-op at best.
+- **Wrong attribution for cost-model source files**: `network_overhead_fit.txt`
+  and `cache_cost_table.csv` are written by the section 3 **plot scripts**
+  (`plot_network_overhead.py` and `plot_cache_cost.py`), not by the merge step.
+  Corrected source attribution in both the Part 3 intro bullet and the Step 2
+  update instruction.
+- **Wrong paths for cost-model source files**: both files live in
+  `paper/figures/section3/output/300W/`, not `paper/figures/section3/output/`.
+  Fixed both path references.
+- **Incorrect profiling prompt-file prerequisite scope**: all three launch
+  scripts (decode grid, prefill profile, interference) and `run_cache_cost.py`
+  need `prompts_*x2048.json`; the previous note said only `launch_prefill_profile.sh`
+  needed them.
+- **`profiling/generate_long_prompts.py` does not exist** in this repo (it
+  lives in AgentScaling's data dir). Replaced with a `scp` transfer command.
+- **`adaptive_disagg_oracle` policy added to the `run_sweep.sh` parameter
+  table**: it is registered in `scheduler.py`, listed in `profile_1pxd.sh`
+  `valid_args`, and appears in `main.py` choices, but was absent from the table.
+  Added with the correct arrival trace type (`iter1_decoding_start`).
+- **`ts` (moreutils) added to §1.2 hardware prerequisites**: the dcgmi pipeline
+  pipes through `ts` to timestamp each output line; without it dcgmi data
+  collection will fail silently.
+
+## 2026-06-23 — WORKFLOW.md: new-machine portability improvements
+
+Revised `doc/WORKFLOW.md` to be runnable on a fresh cluster without manual
+investigation:
+
+- **New §1.0** — "Machine-specific configuration" explains `config.env` (the
+  three variables to edit before anything else), shows the `source config.sh &&
+  mkdir -p` bootstrap, and calls out the `gpu_model_runner.py` hardcoded path
+  upfront.
+- **§1.1** — CUDA version note rewritten to be machine-agnostic; explains how
+  to verify `torch.cuda.is_available()` rather than assuming CUDA 12.5. HF_HOME
+  example path replaced with a generic placeholder.
+- **§1.2** — Added dcgmi installation requirement and verification command;
+  clarified that `PREFILLER_DEVICE_ID` / `DECODER_DEVICE_IDS` can override
+  default GPU index assignments; noted that power-capped clusters may need
+  `run_sweep.sh` cap-verification adjusted.
+- **§1.3** — Replaced "pre-downloaded to /data/projects/AgentScaling/models"
+  with instructions to set `MODEL_DIR` in `config.env` and download weights
+  via `huggingface-cli`.
+- **§1.4** — Added new-machine vLLM patch workflow: tar the 9 patched files on
+  the source machine, scp to new machine, extract into vllm site-packages.
+  Added post-patch verification command. Corrected `gpu_model_runner.py`
+  hardcoded path note (literal `/data/projects/AgentScaling/gpu_monitoring/`,
+  not `GPU_MON_ROOT`).
+- **§2.1** — Replaced hardcoded `--download-dir /data/projects/AgentScaling/models`
+  with `source config.sh && vllm serve "$MODEL" --download-dir "$MODEL_DIR"`.
+- **§3** — Added prerequisite note for `launch_prefill_profile.sh`: requires
+  `PROFILING_DATA_DIR/prompts_*x2048.json` files (~2.5 GB); pointed to
+  `profiling/generate_long_prompts.py` as the generation path.
+
 ## Centralized `MODEL` in `profiling/paths.py`
 
 `MODEL = "Qwen/Qwen3-0.6B"` was duplicated in all 7 profiling scripts. Moved to

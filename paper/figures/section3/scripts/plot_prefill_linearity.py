@@ -12,12 +12,18 @@ Two-regime fit:
 
 from pathlib import Path
 import json
+import sys
+
+REPO_ROOT = next(p for p in Path(__file__).resolve().parents
+                 if (p / ".conserve_root").exists())
+sys.path.insert(0, str(REPO_ROOT / "profiling"))
+from config import MODEL_SHORT
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-OUT = Path(__file__).parent.parent / "output" / "300W"
+OUT = REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W"
 DATA = OUT / "prefill_profile_data"
 
 WARMUP_DROP = 2          # drop first 2 prompts per L (server warmup)
@@ -124,7 +130,7 @@ def main():
     L_cross = (-b_nc + np.sqrt(disc_nc)) / (2 * a_nc)
 
     with open(OUT / "prefill_linearity_fit.txt", "w") as f:
-        f.write("Qwen3-0.6B single-prompt prefill: three-regime model\n")
+        f.write(f"{MODEL_SHORT} single-prompt prefill: three-regime model\n")
         f.write(f"Source: {DATA}\n")
         f.write(f"Warmup drop: first {WARMUP_DROP} prompts per L\n")
         f.write(f"Floor regime    L < {KNEE_LOW}     : {floor_L}\n")

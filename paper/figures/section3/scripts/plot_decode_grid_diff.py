@@ -11,6 +11,8 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
+from config import MODEL_SHORT
 
 import json
 
@@ -20,9 +22,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 SEC3 = (REPO_ROOT / "paper/figures/section3")
-OUT = SEC3 / "output"                       # write the comparison plot at the top level
-DATA_200W = SEC3 / "output" / "200W" / "decode_grid_cell_summary.csv"
-DATA_300W = SEC3 / "output" / "300W" / "decode_grid_cell_summary.csv"
+OUT = SEC3 / "output" / MODEL_SHORT
+DATA_200W = SEC3 / "output" / MODEL_SHORT / "200W" / "decode_grid_cell_summary.csv"
+DATA_300W = SEC3 / "output" / MODEL_SHORT / "300W" / "decode_grid_cell_summary.csv"
 
 
 def main():

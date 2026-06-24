@@ -26,7 +26,7 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import GPU_MON_ROOT
+from config import GPU_MON_ROOT, MODEL_SHORT
 
 import warnings
 
@@ -36,8 +36,8 @@ import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore")
 
-DATA_DIR = (GPU_MON_ROOT / "Qwen3-0.6B/pd_disagg_300W")
-OUT = (REPO_ROOT / "paper/figures/section3/output/300W")
+DATA_DIR = (GPU_MON_ROOT / MODEL_SHORT / "pd_disagg_300W")
+OUT = (REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W")
 WARMUP_DROP = 16          # drop first N requests per L (server warmup)
 KNEE_L = 1024             # knee: constant regime L<=KNEE_L, linear L>=KNEE_L
 
@@ -166,7 +166,7 @@ def main():
 
     with open(OUT / "network_overhead_fit.txt", "w") as f:
         f.write("PD-disagg network overhead: two-regime model\n")
-        f.write(f"Source: gpu_monitoring/Qwen3-0.6B/pd_disagg_300W/<L>/\n")
+        f.write(f"Source: gpu_monitoring/{MODEL_SHORT}/pd_disagg_300W/<L>/\n")
         f.write(f"Warmup drop: first {WARMUP_DROP} requests per L\n")
         f.write(f"Knee cutoff L = {KNEE_L}\n")
         f.write(f"Low-regime  L: {low_Ls}\n")

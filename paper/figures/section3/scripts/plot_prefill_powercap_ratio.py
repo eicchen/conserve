@@ -16,14 +16,15 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-
+import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
+from config import MODEL_SHORT
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 SEC3 = (REPO_ROOT / "paper/figures/section3")
-OUT = SEC3 / "output"                       # comparison plot lives at the top level
+OUT = SEC3 / "output" / MODEL_SHORT
 
 
 def recheck_hit_median(recheck_dir) -> float:
@@ -49,20 +50,20 @@ def recheck_hit_median(recheck_dir) -> float:
 
 
 def main():
-    df200 = pd.read_csv(SEC3 / "output" / "200W" / "cache_cost_table.csv")
-    df300 = pd.read_csv(SEC3 / "output" / "300W" / "cache_cost_table.csv")
+    df200 = pd.read_csv(SEC3 / "output" / MODEL_SHORT / "200W" / "cache_cost_table.csv")
+    df300 = pd.read_csv(SEC3 / "output" / MODEL_SHORT / "300W" / "cache_cost_table.csv")
 
     # --- outlier fixes (the original sweeps caught a few noisy cells) ---
     # L=128: the 300W cells were cold-start noise -> full warmup re-run row.
-    ov128 = pd.read_csv(SEC3 / "output" / "300W" / "cache_cost_rerun_128_4096.csv")
+    ov128 = pd.read_csv(SEC3 / "output" / MODEL_SHORT / "300W" / "cache_cost_rerun_128_4096.csv")
     ov128 = ov128[ov128["L"] == 128]
     df300 = pd.concat([df300[df300["L"] != 128], ov128], ignore_index=True)
     # L=4096: only the prefix-cache HIT was noisy (miss was fine) -> override
     # just the hit with an isolated single-L recheck, at both power levels.
     df300.loc[df300["L"] == 4096, "hit_p50"] = recheck_hit_median(
-        SEC3 / "output" / "300W" / "cache_cost_recheck_4096")
+        SEC3 / "output" / MODEL_SHORT / "300W" / "cache_cost_recheck_4096")
     df200.loc[df200["L"] == 4096, "hit_p50"] = recheck_hit_median(
-        SEC3 / "output" / "200W" / "cache_cost_recheck_4096")
+        SEC3 / "output" / MODEL_SHORT / "200W" / "cache_cost_recheck_4096")
 
     m = df200.merge(df300, on="L", suffixes=("_200", "_300")).sort_values("L")
     m["miss_ratio"] = m["miss_p50_200"] / m["miss_p50_300"]
