@@ -56,10 +56,18 @@ from minisweagent.models import get_model
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 
+# To switch benchmarks, change DATASET_NAME (and DATASET_SPLIT if needed).
+# OUTPUT_DIR is derived automatically from the repo slug (the part after '/').
+#
+# Tested / planned datasets:
 DATASET_NAME  = "princeton-nlp/SWE-bench_bm25_13K"
+# DATASET_NAME  = "ScaleAI/SWE-bench_Pro"           # https://huggingface.co/datasets/ScaleAI/SWE-bench_Pro
+# DATASET_NAME  = "harborframework/terminal-bench-2.0"  # https://huggingface.co/datasets/harborframework/terminal-bench-2.0
+# DATASET_NAME  = "livecodebench/code_generation"   # https://huggingface.co/datasets/livecodebench/code_generation
+
 DATASET_SPLIT = "test"
 HF_CACHE_DIR  = REPO_ROOT / "conserve" / "datasets"
-OUTPUT_DIR    = REPO_ROOT / "conserve" / "output" / "SWE-bench_bm25_13K"
+OUTPUT_DIR    = REPO_ROOT / "conserve" / "output" / DATASET_NAME.split("/")[-1]
 
 # Parallelism for the agent runs. The bottleneck is usually the LLM endpoint,
 # not local CPU; tune to whatever your serving stack handles.
