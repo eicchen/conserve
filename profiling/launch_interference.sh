@@ -24,7 +24,7 @@ run_phase() {
     local pids=() logs=()
     for s in 0 1 2; do
         local log="$base/launcher_gpu${s}.log"
-        CUDA_VISIBLE_DEVICES=$s "$PY" "$SCRIPT_DIR/$script" \
+        CUDA_VISIBLE_DEVICES=$(gpu_range $s) "$PY" "$SCRIPT_DIR/$script" \
             --n-shards 3 --shard-id "$s" --port $((7701 + s)) \
             --out "$base/shard$s" > "$log" 2>&1 &
         pids+=($!)

@@ -34,7 +34,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE
 
 
 import aiohttp
@@ -85,6 +85,7 @@ def start_server():
         "--engine-log-file", str(OUT / "server_engine.jsonl"),
         "--core-log-file", str(OUT / "server_core.jsonl"),
         "--gpu-memory-utilization", "0.85",
+        "--tensor-parallel-size", str(TENSOR_PARALLEL_SIZE),
     ]
     log = open(OUT / "server.log", "w")
     proc = subprocess.Popen(cmd, env=env, stdout=log, stderr=subprocess.STDOUT,

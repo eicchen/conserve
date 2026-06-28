@@ -19,4 +19,10 @@ fi
 [[ "$MODELS_ROOT" != /* ]] && MODELS_ROOT="$REPO_ROOT/$MODELS_ROOT"
 [[ "$GPU_MON_ROOT" != /* ]] && GPU_MON_ROOT="$REPO_ROOT/$GPU_MON_ROOT"
 
-export MODEL MODEL_DIR MODELS_ROOT GPU_TYPE GPU_MON_ROOT
+export MODEL MODEL_DIR MODELS_ROOT GPU_TYPE GPU_MON_ROOT TENSOR_PARALLEL_SIZE
+
+gpu_range() {
+    local group=$1 tp=${TENSOR_PARALLEL_SIZE:-1}
+    local start=$((group * tp))
+    seq -s, $start $((start + tp - 1))
+}

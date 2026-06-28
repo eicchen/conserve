@@ -19,7 +19,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, TENSOR_PARALLEL_SIZE
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -80,6 +80,7 @@ def main():
         max_model_len=MAX_MODEL_LEN,
         enforce_eager=True,
         enable_prefix_caching=False,
+        tensor_parallel_size=TENSOR_PARALLEL_SIZE,
     )
     sp = SamplingParams(
         temperature=1.2, top_p=1.0, max_tokens=2,

@@ -13,7 +13,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL, TENSOR_PARALLEL_SIZE
 
 import time
 
@@ -29,6 +29,7 @@ LLM_ARGS = {
     'max_num_batched_tokens': 16384*2,
     'max_num_seqs': 1024,
     'enforce_eager': True,
+    'tensor_parallel_size': TENSOR_PARALLEL_SIZE,
 }
 SAMPLING_PARAMS_ARGS = {
     'temperature': 1.2,

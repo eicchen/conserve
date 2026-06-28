@@ -206,7 +206,7 @@ launch_disagg_proxy_engines() {
 launch_engines() {
     local log_dir=$1
 
-    CUDA_VISIBLE_DEVICES=${PREFILLER_DEVICE_ID} \
+    CUDA_VISIBLE_DEVICES=$(gpu_range ${PREFILLER_DEVICE_ID}) \
         vllm serve "$MODEL" \
         --port 7100 \
         --dtype auto \
@@ -216,6 +216,7 @@ launch_engines() {
         --max-num-batched-tokens "$MAX_NUM_BATCHED_TOKENS" \
         --max-num-seqs 1024 \
         --enforce-eager \
+        --tensor-parallel-size "${TENSOR_PARALLEL_SIZE:-1}" \
         --engine-log-file "$log_dir/prefiller_vllm_engine_log.jsonl" \
         --core-log-file   "$log_dir/prefiller_vllm_core_log.jsonl" \
         > >(tee logs/prefiller.log) 2>&1 &
@@ -223,7 +224,7 @@ launch_engines() {
 
     for device in "${DECODER_DEVICES_ARR[@]}"; do
         echo "Decoder device: $device"
-        CUDA_VISIBLE_DEVICES="$device" \
+        CUDA_VISIBLE_DEVICES=$(gpu_range $device) \
             vllm serve "$MODEL" \
             --port $((7199 + device)) \
             --dtype auto \
@@ -233,6 +234,7 @@ launch_engines() {
             --max-num-batched-tokens "$MAX_NUM_BATCHED_TOKENS" \
             --max-num-seqs 1024 \
             --enforce-eager \
+            --tensor-parallel-size "${TENSOR_PARALLEL_SIZE:-1}" \
             --engine-log-file "$log_dir/decoder${device}_vllm_engine_log.jsonl" \
             --core-log-file   "$log_dir/decoder${device}_vllm_core_log.jsonl" \
             > >(tee "logs/decoder${device}.log") 2>&1 &
@@ -253,7 +255,7 @@ main() {
     ensure_arg_exists "$@"
     parse_device_ids "$2"
     build_decoder_args
-    check_num_gpus "$(( $2 + 1 ))"
+    check_num_gpus "$(( ($2 + 1) * TENSOR_PARALLEL_SIZE ))"
     ensure_python_library_installed lmcache
     ensure_python_library_installed nixl
     ensure_python_library_installed pandas

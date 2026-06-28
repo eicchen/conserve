@@ -39,6 +39,7 @@ MODELS_ROOT = _resolve_path("MODELS_ROOT", "model_outputs")
 MODEL_DATA_DIR = MODELS_ROOT / MODEL_SHORT
 GPU_TYPE = _get("GPU_TYPE", "A40")
 GPU_MON_ROOT = _resolve_path("GPU_MON_ROOT", f"profiling/gpu_profiling/{GPU_TYPE}")
+TENSOR_PARALLEL_SIZE = int(_get("TENSOR_PARALLEL_SIZE", "1"))
 
 # Stamp the values back into os.environ so subprocesses (e.g. bash scripts
 # launched from a notebook) see the file-derived values, not stale shell vars.
@@ -48,3 +49,4 @@ os.environ["MODELS_ROOT"] = str(MODELS_ROOT)
 os.environ["MODEL_DATA_DIR"] = str(MODEL_DATA_DIR)
 os.environ["GPU_TYPE"] = str(GPU_TYPE)
 os.environ["GPU_MON_ROOT"] = str(GPU_MON_ROOT)
+os.environ["TENSOR_PARALLEL_SIZE"] = str(TENSOR_PARALLEL_SIZE)

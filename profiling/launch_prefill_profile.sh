@@ -26,7 +26,7 @@ for GPU in 1 2 3; do
     L_LIST="${SHARDS[$GPU]}"
     LOG="$OUT_DIR/launcher_gpu${GPU}.log"
     echo "GPU $GPU  ←  L = ${L_LIST}"
-    CUDA_VISIBLE_DEVICES=$GPU "$PY" "$SCRIPT_DIR/run_prefill_profile.py" \
+    CUDA_VISIBLE_DEVICES=$(gpu_range $GPU) "$PY" "$SCRIPT_DIR/run_prefill_profile.py" \
         --L-list "$L_LIST" > "$LOG" 2>&1 &
     PIDS+=($!)
     LOGS+=("$LOG")

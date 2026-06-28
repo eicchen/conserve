@@ -33,7 +33,7 @@ import torch.distributed as dist
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE
 
 
 from vllm import LLM, SamplingParams
@@ -163,6 +163,7 @@ def main():
         max_model_len=MAX_MODEL_LEN,
         enforce_eager=True,
         enable_prefix_caching=False,
+        tensor_parallel_size=TENSOR_PARALLEL_SIZE,
     )
     tokenizer = llm.get_tokenizer()
 

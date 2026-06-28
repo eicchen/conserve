@@ -1,4 +1,9 @@
 #!/bin/bash
+_d="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+while [ "$_d" != "/" ] && [ ! -e "$_d/.conserve_root" ]; do _d="$(dirname "$_d")"; done
+REPO_ROOT="$_d"
+source "$REPO_ROOT/config.sh"
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -31,12 +36,12 @@ fi
 if [[ $1 == "prefiller" ]]; then
     # Prefiller listens on port 7100
     prefill_config_file=$CONFIGS_DIR/lmcache-prefiller-config.yaml
-    echo prefiller device: CUDA_VISIBLE_DEVICES=${PREFILLER_DEVICE_ID:-0}
+    echo prefiller device: CUDA_VISIBLE_DEVICES=$(gpu_range ${PREFILLER_DEVICE_ID:-0})
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$prefill_config_file \
         VLLM_ENABLE_V1_MULTIPROCESSING=1 \
         VLLM_WORKER_MULTIPROC_METHOD=spawn \
-        CUDA_VISIBLE_DEVICES=${PREFILLER_DEVICE_ID:-0} \
+        CUDA_VISIBLE_DEVICES=$(gpu_range ${PREFILLER_DEVICE_ID:-0}) \
         vllm serve $MODEL \
         --port 7100 \
         --trust-remote-code \
@@ -47,6 +52,7 @@ if [[ $1 == "prefiller" ]]; then
         --disable-log-requests \
         --enforce-eager \
         --no-enable-prefix-caching \
+        --tensor-parallel-size ${TENSOR_PARALLEL_SIZE:-1} \
         --kv-transfer-config \
         '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_producer","kv_connector_extra_config": {"discard_partial_chunks": false, "lmcache_rpc_port": "producer1"}}' \
         --engine-log-file $LOG_DIR/prefiller_vllm_engine_log.jsonl \
@@ -58,12 +64,12 @@ elif [[ $1 == "decoder" ]]; then
     # Decoder listens on port 7200
     decode_config_file=$CONFIGS_DIR/lmcache-decoder-config.yaml
 
-    echo decoder device: CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1}
+    echo decoder device: CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1})
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \
         VLLM_ENABLE_V1_MULTIPROCESSING=1 \
         VLLM_WORKER_MULTIPROC_METHOD=spawn \
-        CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
+        CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1}) \
         vllm serve $MODEL \
         --port 7200 \
         --download-dir "$MODEL_DIR" \
@@ -73,22 +79,24 @@ elif [[ $1 == "decoder" ]]; then
         --disable-log-requests \
         --enforce-eager \
         --no-enable-prefix-caching \
+        --tensor-parallel-size ${TENSOR_PARALLEL_SIZE:-1} \
         --kv-transfer-config \
         '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_consumer","kv_connector_extra_config": {"discard_partial_chunks": false, "lmcache_rpc_port": "consumer1", "skip_last_n_tokens": 1}}' \
         --engine-log-file $LOG_DIR/decoder_vllm_engine_log.jsonl \
         --core-log-file $LOG_DIR/decoder_vllm_core_log.jsonl \
-        --gpu-memory-utilization 0.8 
+        --gpu-memory-utilization 0.8
 
 
 elif [[ $1 == "decoder1" ]]; then
     # Decoder listens on port 7200
     decode_config_file=$CONFIGS_DIR/lmcache-decoder-1-config.yaml
 
+    echo decoder1 device: CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1})
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \
         VLLM_ENABLE_V1_MULTIPROCESSING=1 \
         VLLM_WORKER_MULTIPROC_METHOD=spawn \
-        CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
+        CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1}) \
         vllm serve $MODEL \
         --port 7200 \
         --download-dir "$MODEL_DIR" \
@@ -98,6 +106,7 @@ elif [[ $1 == "decoder1" ]]; then
         --disable-log-requests \
         --enforce-eager \
         --no-enable-prefix-caching \
+        --tensor-parallel-size ${TENSOR_PARALLEL_SIZE:-1} \
         --kv-transfer-config \
         '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_consumer","kv_connector_extra_config": {"discard_partial_chunks": false, "lmcache_rpc_port": "consumer1", "skip_last_n_tokens": 1}}' \
         --engine-log-file $LOG_DIR/decoder1_vllm_engine_log.jsonl \
@@ -109,11 +118,12 @@ elif [[ $1 == "decoder2" ]]; then
     # Decoder listens on port 7200
     decode_config_file=$CONFIGS_DIR/lmcache-decoder-2-config.yaml
 
+    echo decoder2 device: CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1})
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \
         VLLM_ENABLE_V1_MULTIPROCESSING=1 \
         VLLM_WORKER_MULTIPROC_METHOD=spawn \
-        CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
+        CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1}) \
         vllm serve $MODEL \
         --port 7201 \
         --download-dir "$MODEL_DIR" \
@@ -123,6 +133,7 @@ elif [[ $1 == "decoder2" ]]; then
         --disable-log-requests \
         --enforce-eager \
         --no-enable-prefix-caching \
+        --tensor-parallel-size ${TENSOR_PARALLEL_SIZE:-1} \
         --kv-transfer-config \
         '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_consumer","kv_connector_extra_config": {"discard_partial_chunks": false, "lmcache_rpc_port": "consumer1", "skip_last_n_tokens": 1}}' \
         --engine-log-file $LOG_DIR/decoder2_vllm_engine_log.jsonl \
@@ -132,11 +143,12 @@ elif [[ $1 == "decoder3" ]]; then
     # Decoder listens on port 7200
     decode_config_file=$CONFIGS_DIR/lmcache-decoder-3-config.yaml
 
+    echo decoder3 device: CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1})
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \
         VLLM_ENABLE_V1_MULTIPROCESSING=1 \
         VLLM_WORKER_MULTIPROC_METHOD=spawn \
-        CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1} \
+        CUDA_VISIBLE_DEVICES=$(gpu_range ${DECODER_DEVICE_ID:-1}) \
         vllm serve $MODEL \
         --port 7202 \
         --download-dir "$MODEL_DIR" \
@@ -146,6 +158,7 @@ elif [[ $1 == "decoder3" ]]; then
         --disable-log-requests \
         --enforce-eager \
         --no-enable-prefix-caching \
+        --tensor-parallel-size ${TENSOR_PARALLEL_SIZE:-1} \
         --kv-transfer-config \
         '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_consumer","kv_connector_extra_config": {"discard_partial_chunks": false, "lmcache_rpc_port": "consumer1", "skip_last_n_tokens": 1}}' \
         --engine-log-file $LOG_DIR/decoder3_vllm_engine_log.jsonl \

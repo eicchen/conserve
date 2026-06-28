@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL, TENSOR_PARALLEL_SIZE
 
 import time
 
@@ -41,6 +41,7 @@ LLM_ARGS = {
     'engine_log_file': out_dir / "vllm_engine_log.jsonl",
     'core_log_file': out_dir / "vllm_core_log.jsonl",
     'enable_prefix_caching': False,
+    'tensor_parallel_size': TENSOR_PARALLEL_SIZE,
 }
 SAMPLING_PARAMS_ARGS = {
     'temperature': 1.2,

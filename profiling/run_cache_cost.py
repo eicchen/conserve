@@ -22,7 +22,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -85,6 +85,7 @@ def main():
         max_model_len=81920,
         enforce_eager=True,
         enable_prefix_caching=True,
+        tensor_parallel_size=TENSOR_PARALLEL_SIZE,
     )
     tokenizer = llm.get_tokenizer()
     sp = SamplingParams(
