@@ -18,15 +18,15 @@ import sys
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import MODEL_SHORT
+from config import MODEL_SHORT, MODEL_DATA_DIR
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-OUT = REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W"
-DATA = OUT / "prefill_profile_data"
-CACHE_DATA = OUT / "cache_cost_data"
+OUT = MODEL_DATA_DIR / "paper" / "section3" / "fig2"
+DATA = MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "prefill_profile_data"
+CACHE_DATA = MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "cache_cost_data"
 CACHE_TABLE = OUT / "cache_cost_table.csv"
 
 WARMUP_DROP = 2

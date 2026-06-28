@@ -2,6 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# configs/ lives one level up from common/ (conserve/conserve/configs/)
+CONFIGS_DIR="$SCRIPT_DIR/../configs"
 LOG_DIR="${LOG_DIR:-$SCRIPT_DIR/logs}"
 MAX_NUM_BATCHED_TOKENS=2944
 # Prefiller may need a larger batch budget when profiling long single prompts;
@@ -28,7 +30,7 @@ fi
 
 if [[ $1 == "prefiller" ]]; then
     # Prefiller listens on port 7100
-    prefill_config_file=$SCRIPT_DIR/configs/lmcache-prefiller-config.yaml
+    prefill_config_file=$CONFIGS_DIR/lmcache-prefiller-config.yaml
     echo prefiller device: CUDA_VISIBLE_DEVICES=${PREFILLER_DEVICE_ID:-0}
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$prefill_config_file \
@@ -54,7 +56,7 @@ if [[ $1 == "prefiller" ]]; then
 
 elif [[ $1 == "decoder" ]]; then
     # Decoder listens on port 7200
-    decode_config_file=$SCRIPT_DIR/configs/lmcache-decoder-config.yaml
+    decode_config_file=$CONFIGS_DIR/lmcache-decoder-config.yaml
 
     echo decoder device: CUDA_VISIBLE_DEVICES=${DECODER_DEVICE_ID:-1}
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
@@ -80,7 +82,7 @@ elif [[ $1 == "decoder" ]]; then
 
 elif [[ $1 == "decoder1" ]]; then
     # Decoder listens on port 7200
-    decode_config_file=$SCRIPT_DIR/configs/lmcache-decoder-1-config.yaml
+    decode_config_file=$CONFIGS_DIR/lmcache-decoder-1-config.yaml
 
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \
@@ -105,7 +107,7 @@ elif [[ $1 == "decoder1" ]]; then
 
 elif [[ $1 == "decoder2" ]]; then
     # Decoder listens on port 7200
-    decode_config_file=$SCRIPT_DIR/configs/lmcache-decoder-2-config.yaml
+    decode_config_file=$CONFIGS_DIR/lmcache-decoder-2-config.yaml
 
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \
@@ -128,7 +130,7 @@ elif [[ $1 == "decoder2" ]]; then
         --gpu-memory-utilization 0.8
 elif [[ $1 == "decoder3" ]]; then
     # Decoder listens on port 7200
-    decode_config_file=$SCRIPT_DIR/configs/lmcache-decoder-3-config.yaml
+    decode_config_file=$CONFIGS_DIR/lmcache-decoder-3-config.yaml
 
     UCX_TLS=cuda_ipc,cuda_copy,tcp \
         LMCACHE_CONFIG_FILE=$decode_config_file \

@@ -1,14 +1,19 @@
+import os
+# Force InprocClient so per-call core_log_file is threaded to EngineCore.step().
+# SyncMPClient (the default) runs EngineCore in a subprocess and silently
+# drops the core_log_file kwarg, leaving vllm_core_log.jsonl unwritten.
+os.environ["VLLM_ENABLE_V1_MULTIPROCESSING"] = "0"
+
 import signal
 from vllm import LLM, SamplingParams
 import json
-import os
 import subprocess
 import signal
 from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, PROFILING_DATA_DIR, GPU_MON_ROOT, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL
 
 import time
 
@@ -19,7 +24,7 @@ LLM_ARGS = {
     'model': MODEL_PATH,
     'dtype': "auto",
     'trust_remote_code': True,
-    'download_dir': MODEL_DIR,
+    'download_dir': str(MODEL_DIR),
     'rope_scaling': {"rope_type": "dynamic", "factor": 2.0},
     'max_num_batched_tokens': 16384*2,
     'max_num_seqs': 1024,
@@ -56,7 +61,7 @@ in_token_size = 8
 total_out_token_size = 65536
 batch_sizes = [args.batch_size]
 request_count = 16
-in_dir = Path(PROFILING_DATA_DIR)
+in_dir = MODEL_DATA_DIR / "long_prompts"
 out_dir = Path(f"{GPU_MON_ROOT}/{MODEL_SUFFIX}/decode")
 
 

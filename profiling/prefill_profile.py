@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, PROFILING_DATA_DIR, GPU_MON_ROOT, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL
 
 import time
 
@@ -26,7 +26,7 @@ args = parser.parse_args()
 in_token_size = args.in_token_size
 out_token_size = 2
 batch_size = args.batch_size
-in_dir = Path(PROFILING_DATA_DIR)
+in_dir = MODEL_DATA_DIR / "long_prompts"
 out_dir = Path(f"{GPU_MON_ROOT}/{MODEL_PATH.split('/')[-1]}/prefill_8192_81920/{batch_size}")
 # out_dir = Path(f"{GPU_MON_ROOT}/{MODEL_PATH.split('/')[-1]}/test")
 

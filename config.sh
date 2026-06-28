@@ -9,14 +9,14 @@ if [[ -f "$REPO_ROOT/config.env" ]]; then
         # Skip blank lines and comment lines
         [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
         key="${key// /}"  # strip spaces from key
-        # Only set if not already exported in the calling environment
-        [[ -v "$key" ]] || printf -v "$key" '%s' "$val"
+        # config.env is primary — always overwrite any inherited env var
+        printf -v "$key" '%s' "$val"
     done < "$REPO_ROOT/config.env"
 fi
 
 # Resolve relative paths against REPO_ROOT
-[[ "$MODEL_DIR"          != /* ]] && MODEL_DIR="$REPO_ROOT/$MODEL_DIR"
-[[ "$PROFILING_DATA_DIR" != /* ]] && PROFILING_DATA_DIR="$REPO_ROOT/$PROFILING_DATA_DIR"
-[[ "$GPU_MON_ROOT"       != /* ]] && GPU_MON_ROOT="$REPO_ROOT/$GPU_MON_ROOT"
+[[ "$MODEL_DIR"   != /* ]] && MODEL_DIR="$REPO_ROOT/$MODEL_DIR"
+[[ "$MODELS_ROOT" != /* ]] && MODELS_ROOT="$REPO_ROOT/$MODELS_ROOT"
+[[ "$GPU_MON_ROOT" != /* ]] && GPU_MON_ROOT="$REPO_ROOT/$GPU_MON_ROOT"
 
-export MODEL MODEL_DIR PROFILING_DATA_DIR GPU_MON_ROOT
+export MODEL MODEL_DIR MODELS_ROOT GPU_TYPE GPU_MON_ROOT

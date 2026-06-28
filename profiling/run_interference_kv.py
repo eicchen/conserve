@@ -33,7 +33,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, PROFILING_DATA_DIR, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT
 
 
 import aiohttp
@@ -47,7 +47,7 @@ _ap.add_argument("--n-shards", type=int, default=1)
 _ap.add_argument("--shard-id", type=int, default=0)
 _ap.add_argument("--port", type=int, default=7700)
 _ap.add_argument("--out", type=str,
-                 default=f"{REPO_ROOT}/paper/figures/section3/output/300W/interference_kv_data")
+                 default=str(MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "interference_kv_data"))
 _args = _ap.parse_args()
 PORT = _args.port
 OUT = Path(_args.out)
@@ -73,7 +73,7 @@ _PROMPTS_CACHE: dict = {}
 
 def load_prompts(L: int):
     if L not in _PROMPTS_CACHE:
-        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
+        p = MODEL_DATA_DIR / "long_prompts" / f"prompts_{L}x2048.json"
         with open(p) as f:
             _PROMPTS_CACHE[L] = json.load(f)
     return _PROMPTS_CACHE[L]
@@ -86,15 +86,17 @@ def get_prompt(salt: int, L: int) -> str:
 
 
 def start_server():
+    _tmp = MODEL_DATA_DIR / "tmp"
+    _tmp.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    env["TMPDIR"] = "/tmp"
+    env["TMPDIR"] = str(_tmp)
     env["VLLM_ENABLE_V1_MULTIPROCESSING"] = "1"
     env["PATH"] = os.path.dirname(sys.executable) + ":" + env.get("PATH", "")
     cmd = [
         "vllm", "serve", MODEL,
         "--host", "localhost",
         "--port", str(PORT),
-        "--download-dir", MODEL_DIR,
+        "--download-dir", str(MODEL_DIR),
         "--rope-scaling", '{"rope_type":"dynamic","factor":2.0}',
         "--max-num-batched-tokens", "33792",
         "--max-num-seqs", "32",
@@ -208,7 +210,8 @@ async def main():
     try:
         await wait_for_server(timeout_s=600)
         print("Server up. Running cells...", flush=True)
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(
+                connector=aiohttp.TCPConnector(force_close=True)) as session:
             # cell_idx = rep*CELLS_PER_REP + local keeps it globally unique
             # across shards, so per-cell prompt salts never collide.
             CELLS_PER_REP = len(L_DECODER_VALUES) * len(L_PREFILL_VALUES) * 2

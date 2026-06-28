@@ -8,6 +8,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../config.sh"
 PY="${PY:-$(which python3)}"
+MODEL_SHORT="${MODEL##*/}"
+OUT_DIR="${OUT_DIR:-$REPO_ROOT/model_outputs/$MODEL_SHORT/paper/section3/profiling/prefill_profile_data}"
+mkdir -p "$OUT_DIR"
 
 # Static LPT assignment (computed offline based on expected per-L runtimes at 300W).
 # Each line: GPU_id   L1,L2,...
@@ -18,13 +21,15 @@ declare -A SHARDS=(
 )
 
 declare -a PIDS=()
+declare -a LOGS=()
 for GPU in 1 2 3; do
     L_LIST="${SHARDS[$GPU]}"
-    LOG="/tmp/prefill_gpu${GPU}.log"
+    LOG="$OUT_DIR/launcher_gpu${GPU}.log"
     echo "GPU $GPU  ←  L = ${L_LIST}"
     CUDA_VISIBLE_DEVICES=$GPU "$PY" "$SCRIPT_DIR/run_prefill_profile.py" \
         --L-list "$L_LIST" > "$LOG" 2>&1 &
     PIDS+=($!)
+    LOGS+=("$LOG")
 done
 echo
 echo "Waiting for shards..."
@@ -33,7 +38,7 @@ for i in "${!PIDS[@]}"; do
     if wait ${PIDS[$i]}; then
         echo "  shard $i (pid ${PIDS[$i]}) OK"
     else
-        echo "  shard $i (pid ${PIDS[$i]}) FAILED"
+        echo "  shard $i (pid ${PIDS[$i]}) FAILED — see ${LOGS[$i]}"
         FAILED=1
     fi
 done

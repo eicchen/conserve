@@ -17,14 +17,14 @@ import sys
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import MODEL_SHORT
+from config import MODEL_SHORT, MODEL_DATA_DIR
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-OUT = REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W"
-DATA = OUT / "prefill_profile_data"
+OUT = MODEL_DATA_DIR / "paper" / "section3" / "fig2"
+DATA = MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "prefill_profile_data"
 
 WARMUP_DROP = 2          # drop first 2 prompts per L (server warmup)
 KNEE_LOW = 512           # floor line spans L <= 512 only; L=1024 sits clearly above it

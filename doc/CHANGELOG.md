@@ -1,6 +1,70 @@
 # Changelog
 
-## Multi-model support for Section 3 figure scripts
+## Directory renames: `models/` → `model_outputs/`, `models_download/` → `models/`
+
+Renamed the two top-level data directories to eliminate the ambiguity introduced in "Per-model folder reorganization" (see below), where `models/` meant per-model runtime data and `models_download/` meant HF weights — the opposite of what the names suggest.
+
+- **`model_outputs/`** (renamed from `models/`): per-model runtime data — `long_prompts/`, `paper/section3/profiling/`, `paper/section3/fig{N}/`. `MODELS_ROOT` in `config.env` updated from `models` to `model_outputs`.
+- **`models/`** (renamed from `models_download/`): HF weight cache only (`MODEL_DIR`). `MODEL_DIR` in `config.env` updated from `models_download` to `models`.
+- **`profiling/config.py`**: fallback defaults updated to match (`MODEL_DIR` → `"models"`, `MODELS_ROOT` → `"model_outputs"`).
+- **Launch scripts** (`launch_prefill_profile.sh`, `launch_decode_grid.sh`, `launch_interference.sh`): fallback `OUT_DIR`/`SEC3` paths updated from `$REPO_ROOT/models/` to `$REPO_ROOT/model_outputs/`.
+- **`CLAUDE.md`**, **`doc/PAPER_TO_CODE.md`**, **section3 notebook markdown cells**: all path references updated.
+
+## Update section 3 notebook markdown headers and `doc/PAPER_TO_CODE.md`
+
+- **`paper/figures/section3/notebooks/fig{1..8}_*.ipynb` markdown cells**: updated output paths, data-collection paths, and prereq notes to reflect the current `model_outputs/<MODEL_SHORT>/paper/section3/` layout. Added ⚠️ notes to fig7 and fig8 documenting that their collect cells and `plot_prefill_powercap_ratio.py` / `plot_decode_grid_diff.py` still use the pre-reorganization `paper/figures/section3/output/<MODEL_SHORT>/` paths. The final `Image()` display cells in fig4, fig5, fig6 also remain stale (reference old `300W/` paths); the actual plots are written to the right location by the scripts.
+- **`doc/PAPER_TO_CODE.md`**: Section 3 table rewritten to use notebooks as the primary interface column; data/output paths updated to `model_outputs/`; added Section 3 Data Layout block; fixed `profiling/paths.py` → `profiling/config.py` in Key Supporting Files.
+
+## Add `profiling/launch_disagg_profile.sh` (fig3 data collection launcher)
+
+Ported the missing sweep launcher for PD-disagg network-overhead profiling (Section 3, Fig 3). The reference repo had only `disagg_profile.sh` (a bare loop) and `unit_disagg_profile.sh` (single-L runner); neither was reachable from the notebook without adaptation.
+
+- **New file**: `profiling/launch_disagg_profile.sh` — sources `config.sh`, iterates over the 19 L values matching the reference A40 data (128–65536, same set as the prefill linearity sweep), skips L values where `dcgmi_trace.tsv` and `decoder_forward_start_time.csv` already exist, calls `unit_disagg_profile.sh` sequentially with a 5 s cooldown between runs, and exits non-zero if any L fails.
+- Output lands in `$GPU_MON_ROOT/<MODEL_SHORT>/pd_disagg_300W/<L>/` (overridable via `DISAGG_OUT_BASE`), matching what `plot_network_overhead.py` reads.
+
+## GPU-typed profiling data layout (`profiling/gpu_profiling/`)
+
+Replaced the flat `gpu_monitoring/` root with `profiling/gpu_profiling/<GPU_TYPE>/` so A40 and H100 timing data coexist without collision.
+
+- **New directories**: `profiling/gpu_profiling/A40/` and `profiling/gpu_profiling/H100/` (H100 empty; populated when H100 experiments run).
+- **`config.env`**: added `GPU_TYPE=A40`; updated `GPU_MON_ROOT=profiling/gpu_profiling/A40`.
+- **`config.sh`**: added `GPU_TYPE` to the `export` line.
+- **`profiling/config.py`**: added `GPU_TYPE = _get("GPU_TYPE", "A40")`; updated `GPU_MON_ROOT` default to `profiling/gpu_profiling/<GPU_TYPE>`; exports `GPU_TYPE` to `os.environ`. Switch to H100 by setting `GPU_TYPE=H100` and `GPU_MON_ROOT=profiling/gpu_profiling/H100` in `config.env` — no script changes needed.
+
+## Section 3 per-figure output restructure
+
+Separated raw profiling data from figure outputs within each model's data tree. All paths are relative to `models/<MODEL_SHORT>/`.
+
+- **New structure**: raw data in `paper/section3/profiling/<data_type>/` (e.g. `profiling/prefill_profile_data/`); per-figure outputs in `paper/section3/fig{N}/` (fig2 = prefill + cache cost, fig3 = network overhead, fig4 = decode grid, fig5 = interference, fig6 = step drift). Old `profiling/section3/300W/` tree removed.
+- **Data migration**: moved existing raw data dirs and figure files from `profiling/section3/300W/` to their new locations for both `Qwen3-0.6B` and `Qwen3.6-27B`.
+- **Collection scripts** (`run_prefill_profile.py`, `run_decode_grid.py`, `run_cache_cost.py`, `run_interference.py`, `run_interference_kv.py`): updated default output paths from `"profiling"/"section3"/"300W"/<data_type>` to `"paper"/"section3"/"profiling"/<data_type>`.
+- **Launch scripts** (`launch_prefill_profile.sh`, `launch_decode_grid.sh`, `launch_interference.sh`): updated `OUT_DIR` / `SEC3` defaults to match new profiling path.
+- **Plot scripts** (all scripts in `paper/figures/section3/scripts/`): `DATA` now reads from `paper/section3/profiling/<data_type>/`; `OUT` now writes to `paper/section3/fig{N}/`. `plot_decode_flat.py` and `plot_decode_knee.py` also fixed: replaced hardcoded `"Qwen3-0.6B"` in `BASE` path with `MODEL_SHORT`, added `MODEL_DATA_DIR` import. `plot_cache_cost.py` gains a `--out` argument (default `fig2/`) separate from `--dir` (profiling dir).
+- Cross-model figures (fig7, fig8, fig1) left unchanged — they depend on 200W+300W data not yet restructured.
+
+## Per-model folder reorganization: `models/` and `models_download/`
+
+> **Superseded by "Directory renames" entry above.** The directory names introduced here were subsequently renamed: `models/` → `model_outputs/` (per-model data) and `models_download/` → `models/` (HF cache).
+
+- **`models/` (new)**: centralized per-model data directory. Each model gets `models/<MODEL_SHORT>/long_prompts/` (prompt JSON files) and `models/<MODEL_SHORT>/profiling/section3/300W/` (raw profiling data + notebook-generated figures).
+- **`models_download/` (renamed from `models/`)**: HF weight cache only, pointed to by `MODEL_DIR`. No functional change — just renamed to clarify its role.
+- **`config.env`**: replaced `PROFILING_DATA_DIR=data/profiling` with `MODELS_ROOT=models`; renamed `MODEL_DIR` default from `models` to `models_download`.
+- **`profiling/config.py`**: replaced `PROFILING_DATA_DIR` with `MODELS_ROOT` and derived `MODEL_DATA_DIR = MODELS_ROOT / MODEL_SHORT`. Both are exported to `os.environ`. Removed `PROFILING_DATA_DIR` export entirely.
+- **`config.sh`**: exports `MODELS_ROOT` instead of `PROFILING_DATA_DIR`.
+- **Profiling scripts** (`run_prefill_profile.py`, `run_decode_grid.py`, `run_cache_cost.py`, `run_interference.py`, `run_interference_kv.py`, `decode_profile.py`, `prefill_profile.py`, `generate_long_prompts.py`): replaced all `PROFILING_DATA_DIR` references with `MODEL_DATA_DIR / "long_prompts"`; replaced all `paper/figures/section3/output/<MODEL_SHORT>/300W/` output paths with `MODEL_DATA_DIR / "profiling" / "section3" / "300W"`.
+- **Launch scripts** (`launch_prefill_profile.sh`, `launch_decode_grid.sh`, `launch_interference.sh`): updated fallback `OUT_DIR`/`SEC3` to `$REPO_ROOT/models/$MODEL_SHORT/profiling/section3/300W/…`.
+- **Plot scripts** (`paper/figures/section3/scripts/`, 9 files): added `MODEL_DATA_DIR` to imports; replaced `paper/figures/section3/output/<MODEL_SHORT>/300W` paths with `MODEL_DATA_DIR / "profiling" / "section3" / "300W"`.
+- **Data moved**: `paper/figures/section3/output/300W/` → `models/Qwen3-0.6B/profiling/section3/300W/` (most complete 0.6B dataset); `paper/figures/section3/output/Qwen3.6-27B/300W/` → `models/Qwen3.6-27B/profiling/section3/300W/`; `profiling/long_prompts/prompts_8192x2048.json` → `models/Qwen3-0.6B/long_prompts/prompts_8192x2048.json`. Redundant `paper/figures/section3/output/Qwen3-0.6B/` (strict subset) removed.
+- **Note**: `paper/figures/section3/notebooks/*.ipynb` still reference old paths and will need manual updates before re-running.
+
+## Portable prompt-file layout and GPU monitoring documentation
+
+- **`profiling/long_prompts/generate_long_prompts.py`** — new script (moved from the reference repo). Generates `prompts_{L}x2048.json` for L > 8192 by cyclically concatenating the 8192-token seed file. All paths come from `config.py` (`MODEL`, `MODEL_DIR`, `PROFILING_DATA_DIR`). Reads seed from and writes output to `PROFILING_DATA_DIR/<MODEL_SHORT>/` so different models never overwrite each other. Accepts `--targets L1,L2,...` to override the default set.
+- **`profiling/run_prefill_profile.py`** — `load_prompts()` now reads from `PROFILING_DATA_DIR/<MODEL_SHORT>/` instead of the flat `PROFILING_DATA_DIR` root, matching the layout written by `generate_long_prompts.py`.
+- **`doc/WORKFLOW.md`** — added "GPU Monitoring Data (`GPU_MON_ROOT`)" subsection at the end of Part 3. Explains what the directory contains (`decode/<B>/` and `pd_disagg_300W/<L>/`), what each type of run captures, which figure scripts consume each subtree, the multi-model namespacing under `<MODEL_SHORT>`, and the commands to collect decode data via `decode_profile.py`. Replaces scattered one-line references that previously left the concept undefined.
+- **`CLAUDE.md`** — corrected three stale facts: `generate_long_prompts.py` now exists at `profiling/long_prompts/`; prompt files live at `PROFILING_DATA_DIR/<MODEL_SHORT>/`; `decode_profile.py` does produce figs 4/6 gpu-monitoring data (only fig3 pd_disagg data is missing). Added portability rule: no hardcoded machine-specific paths in source or docs.
+
+## Multi-model support for Section 3 data-collection and figure scripts
 
 - **`profiling/config.py`**: Added `MODEL_SHORT = MODEL.split("/")[-1]` (e.g. `Qwen3.6-27B` from `Qwen/Qwen3.6-27B`).
 - **`paper/figures/section3/scripts/` (all 10 plot scripts)**: Output directories changed from the hardcoded `output/300W/` (or `output/200W/`) to `output/<MODEL_SHORT>/300W/` (and `output/<MODEL_SHORT>/200W/`). Figures from different models now land in separate subdirectories instead of overwriting each other.
@@ -8,6 +72,11 @@
 - **`plot_prefill_linearity.py`** and **`plot_prefill_with_cache.py`**: These two scripts had no `REPO_ROOT` or config import; added both, replacing `Path(__file__).parent.parent` relative paths with explicit `REPO_ROOT`-anchored paths.
 - **`plot_prefill_linearity.py`**: Hardcoded model name in `prefill_linearity_fit.txt` output replaced with `MODEL_SHORT`.
 - No changes to `plot_trace.py` (workload-distribution plot; not model-specific).
+- **`profiling/run_prefill_profile.py`**: Updated hardcoded `OUT` path to `output/<MODEL_SHORT>/300W/prefill_profile_data`.
+- **`profiling/run_cache_cost.py`**, **`run_decode_grid.py`**, **`run_interference.py`**, **`run_interference_kv.py`**: Updated argparse `--out`/`--out-dir` defaults from `output/300W/…` to `output/<MODEL_SHORT>/300W/…`.
+- **`profiling/launch_decode_grid.sh`**, **`profiling/launch_interference.sh`**: Added `MODEL_SHORT="${MODEL##*/}"` after sourcing `config.sh`; updated fallback `OUT_DIR`/`SEC3` to include the model subfolder.
+- **`profiling/launch_prefill_profile.sh`**: Fixed `Permission denied` crash — logs were written to `/tmp/prefill_gpuN.log` which is not writable. Added `MODEL_SHORT`, computed `OUT_DIR` (mirrors the Python script's output path), runs `mkdir -p`, and writes logs to `OUT_DIR/launcher_gpuN.log` (consistent with `launch_decode_grid.sh`).
+- **Notebooks (fig2–fig8 display cells; fig7/fig8 collect cells)**: Updated all hardcoded `output/300W/` and `output/200W/` paths to use `MODEL_SHORT` from config. Fig7 collect cell was functionally broken (200W data written to wrong directory); fig8 collect cell's skip-if-exists check always evaluated to False.
 
 ## Benchmark switching: dynamic OUTPUT_DIR and WORKFLOW.md section
 
@@ -135,6 +204,14 @@ decode-grid cell writes its own JSONL file.
 
 ---
 
+## `launch_interference.sh` / `run_interference*.py` — robustness fixes
+
+- `launch_interference.sh` restructured to match canonical pattern (`SCRIPT_DIR`, `PY` variable, `set -euo pipefail`, no `cd`, absolute script paths, `pkill || true`); removed `export TMPDIR=/tmp` and `export PATH` manipulation
+- Added phase argument to `launch_interference.sh`: `bash launch_interference.sh 1` or `2` to run a single phase; default runs both
+- `run_interference.py` / `run_interference_kv.py`: fixed `env["TMPDIR"]` from `"/tmp"` (unwritable on bbq) to `MODEL_DATA_DIR / "tmp"`
+- `run_interference.py` / `run_interference_kv.py`: added `aiohttp.TCPConnector(force_close=True)` to prevent `ServerDisconnectedError` from stale keep-alive connections during long cells
+- `fig5_interference.ipynb`: added `cell-collect-kv` cell to run phase 2 independently; updated header to document the phase argument
+
 ## Section 3 figure notebooks
 - Added `paper/figures/section3/notebooks/fig{1..8}_*.ipynb` — one notebook per figure covering all 8 section-3 figures
 - Each notebook: markdown call-order cell → optional prereq data-collection cell (separate, skippable) → `%run` plotting cell → inline display cell
@@ -231,26 +308,10 @@ to reflect its broader role.
 
 Items that are still hardcoded or lack a single source of truth:
 
-- **Section 3 plot scripts — model name baked into directory paths.**
-  Four scripts build data paths using the literal string `"Qwen3-0.6B"` as a
-  subdirectory component under `GPU_MON_ROOT` (e.g. `GPU_MON_ROOT / "Qwen3-0.6B/decode"`).
-  Affected files: `plot_decode_flat.py:29`, `plot_decode_knee.py:29`,
-  `plot_decode_step_drift.py:31`, `plot_network_overhead.py:39`.
-  These cannot be derived from `MODEL` because the on-disk directory names were
-  created with the literal suffix. A model swap requires renaming the output
-  directories and updating these four paths.
-
 - **`conserve/src/profile_agent.py:25` — hardcoded `ENGINE` URL separate from argparse default.**
   `ENGINE = "http://127.0.0.1:9101"` is set at module level independently of the
   `--proxy-port` argparse default (also 9101) on line 115. The two are not linked;
   changing the port requires updating both.
-
-- **`300W` hardcoded as the Section 3 output subdirectory.**
-  Default output paths in `run_decode_grid.py`, `run_prefill_profile.py`,
-  `run_interference.py`, and `run_interference_kv.py` all resolve to
-  `paper/figures/section3/output/300W/…`. Plot scripts read from the same path.
-  Running Section 3 experiments at a different power cap requires overriding
-  `--out-dir` / `--dir` on every script and updating the plot script paths manually.
 
 - **Ports have no single source of truth.**
   Ports 7100 (prefiller), 7200–7202 (decoders), 9101 (disagg proxy) are repeated

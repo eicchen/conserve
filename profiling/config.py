@@ -22,9 +22,7 @@ _cfg = _load_config_env()
 
 
 def _get(key, fallback=None):
-    val = os.environ.get(key)
-    if val is not None:
-        return val
+    # config.env is primary — not the inherited shell environment
     return _cfg.get(key, fallback)
 
 
@@ -35,6 +33,18 @@ def _resolve_path(key, fallback):
 
 
 MODEL = _get("MODEL", "Qwen/Qwen3-0.6B")
+MODEL_SHORT = MODEL.split("/")[-1]
 MODEL_DIR = _resolve_path("MODEL_DIR", "models")
-PROFILING_DATA_DIR = _resolve_path("PROFILING_DATA_DIR", "data/profiling")
-GPU_MON_ROOT = _resolve_path("GPU_MON_ROOT", "gpu_monitoring")
+MODELS_ROOT = _resolve_path("MODELS_ROOT", "model_outputs")
+MODEL_DATA_DIR = MODELS_ROOT / MODEL_SHORT
+GPU_TYPE = _get("GPU_TYPE", "A40")
+GPU_MON_ROOT = _resolve_path("GPU_MON_ROOT", f"profiling/gpu_profiling/{GPU_TYPE}")
+
+# Stamp the values back into os.environ so subprocesses (e.g. bash scripts
+# launched from a notebook) see the file-derived values, not stale shell vars.
+os.environ["MODEL"] = MODEL
+os.environ["MODEL_DIR"] = str(MODEL_DIR)
+os.environ["MODELS_ROOT"] = str(MODELS_ROOT)
+os.environ["MODEL_DATA_DIR"] = str(MODEL_DATA_DIR)
+os.environ["GPU_TYPE"] = str(GPU_TYPE)
+os.environ["GPU_MON_ROOT"] = str(GPU_MON_ROOT)

@@ -19,15 +19,16 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import GPU_MON_ROOT
+from config import GPU_MON_ROOT, MODEL_SHORT, MODEL_DATA_DIR
 
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-BASE = (GPU_MON_ROOT / "Qwen3-0.6B/decode")
-OUT = Path(__file__).parent.parent / "output" / "300W"
+BASE = (GPU_MON_ROOT / MODEL_SHORT / "decode")
+OUT = MODEL_DATA_DIR / "paper" / "section3" / "fig4"
+OUT.mkdir(parents=True, exist_ok=True)
 SUBMITTED = [1, 2, 4, 8, 16, 32, 64]
 INPUT_LEN = 8
 WARMUP_DROP = 32

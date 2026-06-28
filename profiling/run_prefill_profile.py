@@ -19,14 +19,14 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, PROFILING_DATA_DIR, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
 from vllm import LLM, SamplingParams
 
 # MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
-OUT = (REPO_ROOT / "paper/figures/section3/output/300W/prefill_profile_data")
+OUT = MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "prefill_profile_data"
 OUT.mkdir(parents=True, exist_ok=True)
 
 L_VALUES = [128, 256, 512, 1024, 2048, 4096, 6144, 8192, 10240, 12288,
@@ -47,10 +47,11 @@ def load_prompts(L: int, tokenizer):
     For L values without a dedicated file (40960, 49152, 57344), take the
     first L tokens of the 65536 prompts.
     """
+    prompt_dir = MODEL_DATA_DIR / "long_prompts"
     if L in HAVE_FILES:
-        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
+        p = prompt_dir / f"prompts_{L}x2048.json"
         return [d["prompt"] for d in json.loads(p.read_text())[:N_PROMPTS_PER_L]]
-    src = json.loads(Path(f"{PROFILING_DATA_DIR}/prompts_65536x2048.json").read_text())
+    src = json.loads((prompt_dir / "prompts_65536x2048.json").read_text())
     out = []
     for d in src[:N_PROMPTS_PER_L]:
         ids = tokenizer.encode(d["prompt"], add_special_tokens=False)[:L]
@@ -72,7 +73,7 @@ def main():
     llm = LLM(
         model=MODEL,
         dtype="auto",
-        download_dir=MODEL_DIR,
+        download_dir=str(MODEL_DIR),
         rope_scaling={"rope_type": "dynamic", "factor": ROPE_FACTOR},
         max_num_batched_tokens=max(L_VALUES) + 2048,
         max_num_seqs=4,

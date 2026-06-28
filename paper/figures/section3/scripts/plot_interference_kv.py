@@ -15,14 +15,14 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import MODEL_SHORT
+from config import MODEL_SHORT, MODEL_DATA_DIR
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-DATA = (REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W" / "interference_kv_data")
-OUT = (REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W")
+DATA = (MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "interference_kv_data")
+OUT = (MODEL_DATA_DIR / "paper" / "section3" / "fig5")
 
 
 def _strip(rid: str) -> str:

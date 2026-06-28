@@ -14,19 +14,21 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import MODEL_SHORT
+from config import MODEL_SHORT, MODEL_DATA_DIR
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# --dir picks the power-cap directory (.../section3/300W or .../section3/200W).
 _ap = argparse.ArgumentParser()
 _ap.add_argument("--dir", type=str,
-                 default=str(REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W"))
+                 default=str(MODEL_DATA_DIR / "paper" / "section3" / "profiling"))
+_ap.add_argument("--out", type=str,
+                 default=str(MODEL_DATA_DIR / "paper" / "section3" / "fig2"))
 _args = _ap.parse_args()
 DATA = Path(_args.dir) / "cache_cost_data"
-OUT = Path(_args.dir)
+OUT = Path(_args.out)
+OUT.mkdir(parents=True, exist_ok=True)
 
 
 def parse_cell(cell):

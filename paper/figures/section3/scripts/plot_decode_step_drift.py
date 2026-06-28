@@ -19,7 +19,7 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import GPU_MON_ROOT, MODEL_SHORT
+from config import GPU_MON_ROOT, MODEL_SHORT, MODEL_DATA_DIR
 
 
 import numpy as np
@@ -29,7 +29,7 @@ from scipy.stats import gmean
 from sklearn.linear_model import LinearRegression
 
 DATA = (GPU_MON_ROOT / MODEL_SHORT / "decode" / "64" / "vllm_core_log.jsonl")
-OUT = (REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W")
+OUT = (MODEL_DATA_DIR / "paper" / "section3" / "fig6")
 WARMUP_STEPS = 750   # drop early steps where the engine is still ramping
 BATCH_SIZE = 64
 

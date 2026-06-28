@@ -13,14 +13,14 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import MODEL_SHORT
+from config import MODEL_SHORT, MODEL_DATA_DIR
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
-OUT = (REPO_ROOT / "paper/figures/section3/output" / MODEL_SHORT / "300W")
+OUT = (MODEL_DATA_DIR / "paper" / "section3" / "fig5")
 STEP_COL = "prefill_step_mean_ms"
 
 

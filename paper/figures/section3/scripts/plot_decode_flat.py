@@ -18,7 +18,7 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
-from config import GPU_MON_ROOT
+from config import GPU_MON_ROOT, MODEL_SHORT, MODEL_DATA_DIR
 
 
 import numpy as np
@@ -26,8 +26,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-BASE = (GPU_MON_ROOT / "Qwen3-0.6B/decode")
-OUT = Path(__file__).parent.parent / "output" / "300W"
+BASE = (GPU_MON_ROOT / MODEL_SHORT / "decode")
+OUT = MODEL_DATA_DIR / "paper" / "section3" / "fig4"
+OUT.mkdir(parents=True, exist_ok=True)
 SUBMITTED = [1, 2, 4, 8, 16, 32, 64]
 INPUT_LEN = 8
 WARMUP_DROP = 32  # decode steps to discard at the start of each run
@@ -112,7 +113,7 @@ def main():
     table.to_csv(OUT / "decode_flat_table.csv", index=False)
 
     with open(OUT / "decode_flat_fit.txt", "w") as f:
-        f.write("Qwen3-0.6B decode latency: planar fit\n")
+        f.write(f"{MODEL_SHORT} decode latency: planar fit\n")
         f.write(f"Total decode steps: {len(data)}\n")
         f.write(f"batch_active range: {int(data['batch_active'].min())} to {int(data['batch_active'].max())}\n")
         f.write(f"active_kv_total range: {int(data['active_kv_total'].min())} to {int(data['active_kv_total'].max())}\n")

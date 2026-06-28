@@ -33,13 +33,13 @@ import torch.distributed as dist
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, PROFILING_DATA_DIR, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT
 
 
 from vllm import LLM, SamplingParams
 
 # MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
-DEFAULT_OUT_DIR = (REPO_ROOT / "paper/figures/section3/output/300W/decode_grid_data")
+DEFAULT_OUT_DIR = MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "decode_grid_data"
 
 B_VALUES = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128]
 L_VALUES = [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768]
@@ -59,7 +59,7 @@ _PROMPTS_CACHE: dict = {}
 
 def load_prompts(L: int):
     if L not in _PROMPTS_CACHE:
-        p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
+        p = MODEL_DATA_DIR / "long_prompts" / f"prompts_{L}x2048.json"
         with open(p) as f:
             _PROMPTS_CACHE[L] = json.load(f)
     return _PROMPTS_CACHE[L]
@@ -156,7 +156,7 @@ def main():
     llm = LLM(
         model=MODEL,
         dtype="auto",
-        download_dir=MODEL_DIR,
+        download_dir=str(MODEL_DIR),
         rope_scaling={"rope_type": "dynamic", "factor": ROPE_FACTOR},
         max_num_batched_tokens=MAX_TOK,
         max_num_seqs=MAX_SEQS,

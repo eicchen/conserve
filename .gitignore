@@ -15,8 +15,7 @@ conserve/output/*
 
 # Section-3 raw profiling data (decode grids, prefill linearity, etc.).
 # Moved to conserve_output_backup/profiling.
-paper/figures/section3/output/200W/
-paper/figures/section3/output/300W/
+paper/figures/section3/output/*/
 
 # Plot pipeline caches (auto-regenerated from the raw runs).
 paper/figures/section5/cache/
@@ -30,7 +29,10 @@ conserve/input/compound_prompts.json
 # log files and data set
 conserve/logs/*
 conserve/datasets/*
-models/
+model_outputs/
+models
+profiling/gpu_profiling/
+profiling/logs/
 # =============================================================================
 # In case anyone re-runs experiments and leaves byproducts in the repo,
 # defensive patterns for individual artifact types:

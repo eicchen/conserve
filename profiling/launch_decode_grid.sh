@@ -20,7 +20,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PY="${PY:-$(which python3)}"
-OUT_DIR="${OUT_DIR:-$REPO_ROOT/paper/figures/section3/output/300W/decode_grid_data}"
+MODEL_SHORT="${MODEL##*/}"
+OUT_DIR="${OUT_DIR:-$REPO_ROOT/model_outputs/$MODEL_SHORT/paper/section3/profiling/decode_grid_data}"
 # Override GPUS env to control which GPUs to use (space-separated list).
 # Default uses all 4. Set GPUS="1 2 3" to skip GPU 0.
 GPUS_STR="${GPUS:-0 1 2 3}"
@@ -35,6 +36,7 @@ echo "Launching $NUM_SHARDS shards on GPUs: ${GPUS_ARR[*]}"
 echo
 
 declare -a PIDS=()
+declare -a LOGS=()
 for SHARD in "${!GPUS_ARR[@]}"; do
     GPU=${GPUS_ARR[$SHARD]}
     LOG="$OUT_DIR/launcher_gpu${GPU}.log"
@@ -51,6 +53,7 @@ for SHARD in "${!GPUS_ARR[@]}"; do
         > "$LOG" 2>&1 &
     PID=$!
     PIDS+=($PID)
+    LOGS+=("$LOG")
     echo "  shard $SHARD (GPU $GPU) -> pid $PID, log $LOG"
 done
 echo
@@ -62,7 +65,7 @@ for i in "${!PIDS[@]}"; do
     if wait $PID; then
         echo "  shard $i (pid $PID) OK"
     else
-        echo "  shard $i (pid $PID) FAILED -- see $OUT_DIR/launcher_gpu${i}.log"
+        echo "  shard $i (pid $PID) FAILED — see ${LOGS[$i]}"
         FAILED=1
     fi
 done

@@ -22,7 +22,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, PROFILING_DATA_DIR, MODEL
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -35,7 +35,7 @@ from vllm import LLM, SamplingParams
 # is computed from the L's global index so shard cell files never collide.
 _ap = argparse.ArgumentParser()
 _ap.add_argument("--out", type=str,
-                 default=f"{REPO_ROOT}/paper/figures/section3/output/300W/cache_cost_data")
+                 default=str(MODEL_DATA_DIR / "paper" / "section3" / "profiling" / "cache_cost_data"))
 _ap.add_argument("--l-values", type=str, default="",
                  help="comma-separated L subset for this shard; empty = all")
 _args = _ap.parse_args()
@@ -61,12 +61,12 @@ def build_prompt(cell_idx: int, L: int, tokenizer) -> str:
     L in {40960, 49152, 57344} have no dedicated prompt file; fall back to
     truncating a prompts_65536x2048.json prompt to the first L tokens.
     """
-    p = Path(f"{PROFILING_DATA_DIR}/prompts_{L}x2048.json")
+    p = MODEL_DATA_DIR / "long_prompts" / f"prompts_{L}x2048.json"
     if p.exists():
         with open(p) as f:
             prompts = json.load(f)
         return prompts[cell_idx % len(prompts)]["prompt"]
-    src = Path(f"{PROFILING_DATA_DIR}/prompts_65536x2048.json")
+    src = MODEL_DATA_DIR / "long_prompts" / "prompts_65536x2048.json"
     with open(src) as f:
         prompts = json.load(f)
     text = prompts[cell_idx % len(prompts)]["prompt"]
@@ -78,7 +78,7 @@ def main():
     llm = LLM(
         model=MODEL,
         dtype="auto",
-        download_dir=MODEL_DIR,
+        download_dir=str(MODEL_DIR),
         rope_scaling={"rope_type": "dynamic", "factor": 2.5},
         max_num_batched_tokens=67584,
         max_num_seqs=64,
@@ -99,8 +99,8 @@ def main():
     for wl in [512, 8192, 32768]:
         wp = build_prompt(0, wl, tokenizer)
         llm.generate(fixed_batches=[[wp], [wp]], sampling_params=sp,
-                     engine_log_file="/tmp/cache_cost_warmup_engine.jsonl",
-                     core_log_file="/tmp/cache_cost_warmup_core.jsonl",
+                     engine_log_file=str(OUT / "cache_cost_warmup_engine.jsonl"),
+                     core_log_file=str(OUT / "cache_cost_warmup_core.jsonl"),
                      use_tqdm=False)
     print("warmup done", flush=True)
 
