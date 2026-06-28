@@ -1,5 +1,15 @@
 # Changelog
 
+## TP GPU device assignment — Part 2 (launcher gpu_range wiring + notebook validation cells)
+
+Implemented the GPU device assignment layer for tensor-parallel support. `PREFILLER_DEVICE_ID` and `DECODER_DEVICE_IDS` are now TP-group indices; each launcher converts them to physical GPU strings via `gpu_range()`.
+
+- **`config.sh`**: added `gpu_range()` function after the export line; added `TENSOR_PARALLEL_SIZE` to the export. Group `i` at TP=N maps to physical GPUs `i*N … i*N+N-1`. At TP=1 output is identical to the old single-integer assignment.
+- **`conserve/common/disagg_vllm_launcher.sh`**: added root-walker + `source config.sh` at the top (required for bash function access); replaced `CUDA_VISIBLE_DEVICES=` in all 5 blocks (prefiller, decoder, decoder1, decoder2, decoder3) with `$(gpu_range ...)`; added echo lines for decoder1/2/3 (were previously silent on device assignment).
+- **`conserve/profile_1pxd.sh`** (`launch_engines()`): replaced 2 `CUDA_VISIBLE_DEVICES=` with `$(gpu_range ...)`; `check_num_gpus` argument now multiplied by `TENSOR_PARALLEL_SIZE` so the GPU count check scales correctly.
+- **`profiling/launch_decode_grid.sh`**, **`profiling/launch_prefill_profile.sh`**, **`profiling/launch_interference.sh`**: each had their single `CUDA_VISIBLE_DEVICES=<var>` replaced with `$(gpu_range <var>)`. LPT table in `launch_prefill_profile.sh` left untouched (hardcoded groups 1 2 3; needs manual rebalance for TP>1 — see `doc/tensor_parallelism.md §Deferred`).
+- **Notebooks (Figs 2, 4, 5, 6)**: added a config/validation cell after each setup cell. Cell imports `TENSOR_PARALLEL_SIZE`, `MODEL`, `GPU_TYPE` from `profiling/config`; queries `nvidia-smi` for hardware names; defines Python `gpu_range()` mirroring the bash version; prints Model/GPU/TP/Shards/Groups summary. Fig 4 sets `os.environ["GPUS"]` for `launch_decode_grid.sh`; Fig 6 sets `os.environ["CUDA_VISIBLE_DEVICES"]` for `decode_profile.py`; Fig 2 validates `N_GPUS >= 4*TP` and prints an LPT rebalance warning at TP>1; Fig 5 validates `N_GPUS >= 3*TP`.
+
 ## Directory renames: `models/` → `model_outputs/`, `models_download/` → `models/`
 
 Renamed the two top-level data directories to eliminate the ambiguity introduced in "Per-model folder reorganization" (see below), where `models/` meant per-model runtime data and `models_download/` meant HF weights — the opposite of what the names suggest.
