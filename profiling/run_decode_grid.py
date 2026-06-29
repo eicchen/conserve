@@ -33,7 +33,8 @@ import torch.distributed as dist
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE, PROFILE
 
 
 from vllm import LLM, SamplingParams
@@ -48,8 +49,7 @@ KV_BUDGET = 200_000
 K_REPS = 8
 N_DECODE = 64
 
-ROPE_FACTOR = 2.0           # native 32768 * 2 = 65536 max model len
-MAX_MODEL_LEN = 65536
+MAX_MODEL_LEN = 65536  # 2× native 32K; covers L_VALUES up to 32768
 
 FILLER_TOKEN = 100
 SALT_BASE = 300
@@ -130,7 +130,7 @@ def main():
                 "B_values": B_VALUES, "L_values": L_VALUES,
                 "kv_budget": KV_BUDGET,
                 "k_reps": K_REPS, "n_decode": N_DECODE,
-                "rope_factor": ROPE_FACTOR, "max_model_len": MAX_MODEL_LEN,
+                "max_model_len": MAX_MODEL_LEN,
                 "filler_token": FILLER_TOKEN, "salt_base": SALT_BASE,
                 "num_shards": args.num_shards,
                 "cells": [
@@ -157,13 +157,14 @@ def main():
         model=MODEL,
         dtype="auto",
         download_dir=str(MODEL_DIR),
-        rope_scaling={"rope_type": "dynamic", "factor": ROPE_FACTOR},
         max_num_batched_tokens=MAX_TOK,
         max_num_seqs=MAX_SEQS,
-        max_model_len=MAX_MODEL_LEN,
         enforce_eager=True,
         enable_prefix_caching=False,
         tensor_parallel_size=TENSOR_PARALLEL_SIZE,
+        max_model_len=MAX_MODEL_LEN,
+        **({"rope_scaling": {"rope_type": "dynamic", "factor": MAX_MODEL_LEN / PROFILE.native_ctx}}
+           if MAX_MODEL_LEN > PROFILE.native_ctx else {}),
     )
     tokenizer = llm.get_tokenizer()
 
@@ -171,10 +172,7 @@ def main():
         temperature=1.2,
         top_p=1.0,
         max_tokens=N_DECODE,
-        logit_bias={
-            2: -100, 13: -100,
-            151643: -100, 151644: -100, 151645: -100,
-        },
+        logit_bias={tid: -100 for tid in PROFILE.eos_token_ids},
     )
 
     dcgmi_proc = None

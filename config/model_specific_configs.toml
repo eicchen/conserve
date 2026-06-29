@@ -1,0 +1,29 @@
+# Per-model vLLM parameters. Add one [models."vendor/Name"] section per model.
+#
+# native_ctx          — max_position_embeddings from HF config.json; the context
+#                       window the model was trained on. Used to compute the
+#                       rope_scaling factor when extending beyond native context.
+#
+# eos_token_ids       — token IDs suppressed via logit_bias=-100 during profiling
+#                       to prevent the model from stopping prematurely mid-response.
+#                       Originally established for Qwen3 — must be verified and
+#                       updated for any non-Qwen model family.
+#
+# vllm_serve_flags    — extra CLI flags appended to every `vllm serve` call for
+#                       this model. Captures flags that differ between vLLM versions
+#                       or model families (e.g. --rope-scaling, --disable-log-requests
+#                       vs --no-enable-log-requests). Each token is a separate string.
+#                       Python scripts splat PROFILE.vllm_serve_flags into the cmd
+#                       list; bash scripts use the VLLM_SERVE_FLAGS array exported
+#                       by config.sh (via `config.py --sh-vars`).
+#
+
+[models."Qwen/Qwen3-0.6B"]
+native_ctx = 32768
+eos_token_ids = [151643, 151644, 151645]  # <|endoftext|>, <|im_start|>, <|im_end|>
+vllm_serve_flags = ["--rope-scaling", '{"rope_type":"dynamic","factor":2.0}', "--disable-log-requests"]
+
+[models."Qwen/Qwen3.6-27B"]
+native_ctx = 262144
+eos_token_ids = [151643, 151644, 151645]  # same Qwen3-family tokenizer vocabulary
+vllm_serve_flags = ["--no-enable-log-requests"]

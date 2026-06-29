@@ -1,14 +1,42 @@
 # Changelog
 
+## 2026-06-29 — Config/ folder + multi-model vLLM serve flags
+
+Moved `config.env`, `config.sh`, `profiling/config.py` into `config/` and eliminated all per-model hardcoding from launchers and profiling scripts.
+
+### config/ folder restructure
+- `config.env`, `config.sh` moved from repo root; `profiling/config.py` moved to `config/config.py`; `model_profiles.toml` renamed to `model_specific_configs.toml`
+- All shell scripts updated to `source "$REPO_ROOT/config/config.sh"`
+- All Python profiling scripts: added `sys.path.insert(0, str(REPO_ROOT / "config"))` before importing; updated to use `PROFILE`
+- All 13 `paper/figures/section3/scripts/` plot scripts: same `sys.path` fix
+- All section3 notebooks (figs 2–8): same `sys.path` fix
+- `profiling/long_prompts/generate_long_prompts.py`: same `sys.path` fix; added `SEED_PATH` constant
+
+### Model-specific vLLM serve flags via TOML
+- `config/model_specific_configs.toml`: added `vllm_serve_flags` list to each model section — Qwen3-0.6B: `["--rope-scaling", '{"rope_type":"dynamic","factor":2.0}', "--disable-log-requests"]`; Qwen3.6-27B: `["--no-enable-log-requests"]`
+- `config/config.py`: `ModelProfile` gains `vllm_serve_flags` field; `--sh-vars` CLI mode emits `VLLM_SERVE_FLAGS=(...)` bash array
+- `config/config.sh`: evals `config.py --sh-vars` at source time to set `VLLM_SERVE_FLAGS` array
+- `conserve/common/disagg_vllm_launcher.sh`: all 5 role blocks replace hardcoded `--rope-scaling`/`--disable-log-requests` with `"${VLLM_SERVE_FLAGS[@]}"`; log args moved to per-role `_log_args` array; GPU mem util now configurable via `PREFILLER_GPU_MEM_UTIL`/`DECODER_GPU_MEM_UTIL`
+- `conserve/profile_1pxd.sh launch_engines()`: same `VLLM_SERVE_FLAGS` replacement
+- `profiling/run_interference.py`, `run_interference_kv.py`: `*PROFILE.vllm_serve_flags` in cmd list; `logit_bias` uses `PROFILE.eos_token_ids`
+
+### All profiling Python scripts — hardcoded values removed
+- `rope_scaling` now conditional: only added when `MAX_MODEL_LEN > PROFILE.native_ctx`
+- `logit_bias` uses `{tid: -100 for tid in PROFILE.eos_token_ids}` (string keys in HTTP-API scripts)
+- Affected: `decode_profile.py`, `prefill_profile.py`, `disagg_profile.py`, `run_prefill_profile.py`, `run_decode_grid.py`, `run_cache_cost.py`
+
+### `doc/technical/` (new folder)
+- `tensor_parallelism.md`, `vllm_changes.md`, `WORKFLOW_Qwen3-0.6B.md` moved here from `doc/`; `multi_model.md` added
+
 ## TP GPU device assignment — Part 2 (launcher gpu_range wiring + notebook validation cells)
 
-Implemented the GPU device assignment layer for tensor-parallel support. `PREFILLER_DEVICE_ID` and `DECODER_DEVICE_IDS` are now TP-group indices; each launcher converts them to physical GPU strings via `gpu_range()`.
+> **Superseded by "Model-specific vLLM serve flags" entry above.** The `gpu_range()` approach was removed during the config/ refactor; a replacement mechanism for `CUDA_VISIBLE_DEVICES` expansion at TP>1 is TBD. The items that remain in effect from this entry are: root-walker + `source config/config.sh` added to `disagg_vllm_launcher.sh`; `check_num_gpus` scaled by `TENSOR_PARALLEL_SIZE` in `profile_1pxd.sh`; config/validation cells added to section 3 notebooks (Figs 4, 5, 6). See `doc/technical/tensor_parallelism.md` for the TBD section and the exact sites to update.
 
-- **`config.sh`**: added `gpu_range()` function after the export line; added `TENSOR_PARALLEL_SIZE` to the export. Group `i` at TP=N maps to physical GPUs `i*N … i*N+N-1`. At TP=1 output is identical to the old single-integer assignment.
-- **`conserve/common/disagg_vllm_launcher.sh`**: added root-walker + `source config.sh` at the top (required for bash function access); replaced `CUDA_VISIBLE_DEVICES=` in all 5 blocks (prefiller, decoder, decoder1, decoder2, decoder3) with `$(gpu_range ...)`; added echo lines for decoder1/2/3 (were previously silent on device assignment).
-- **`conserve/profile_1pxd.sh`** (`launch_engines()`): replaced 2 `CUDA_VISIBLE_DEVICES=` with `$(gpu_range ...)`; `check_num_gpus` argument now multiplied by `TENSOR_PARALLEL_SIZE` so the GPU count check scales correctly.
-- **`profiling/launch_decode_grid.sh`**, **`profiling/launch_prefill_profile.sh`**, **`profiling/launch_interference.sh`**: each had their single `CUDA_VISIBLE_DEVICES=<var>` replaced with `$(gpu_range <var>)`. LPT table in `launch_prefill_profile.sh` left untouched (hardcoded groups 1 2 3; needs manual rebalance for TP>1 — see `doc/tensor_parallelism.md §Deferred`).
-- **Notebooks (Figs 2, 4, 5, 6)**: added a config/validation cell after each setup cell. Cell imports `TENSOR_PARALLEL_SIZE`, `MODEL`, `GPU_TYPE` from `profiling/config`; queries `nvidia-smi` for hardware names; defines Python `gpu_range()` mirroring the bash version; prints Model/GPU/TP/Shards/Groups summary. Fig 4 sets `os.environ["GPUS"]` for `launch_decode_grid.sh`; Fig 6 sets `os.environ["CUDA_VISIBLE_DEVICES"]` for `decode_profile.py`; Fig 2 validates `N_GPUS >= 4*TP` and prints an LPT rebalance warning at TP>1; Fig 5 validates `N_GPUS >= 3*TP`.
+- **`config.sh`**: added `gpu_range()` function — **removed in subsequent refactor**.
+- **`conserve/common/disagg_vllm_launcher.sh`**: added root-walker + `source config.sh` ✓ (still in effect, path updated to `config/config.sh`); replaced `CUDA_VISIBLE_DEVICES=` with `$(gpu_range ...)` — **removed in subsequent refactor**.
+- **`conserve/profile_1pxd.sh`** (`launch_engines()`): replaced `CUDA_VISIBLE_DEVICES=` with `$(gpu_range ...)` — **removed in subsequent refactor**; `check_num_gpus` multiplied by `TENSOR_PARALLEL_SIZE` ✓ (still in effect).
+- **`profiling/launch_decode_grid.sh`**, **`profiling/launch_prefill_profile.sh`**, **`profiling/launch_interference.sh`**: `$(gpu_range ...)` — **removed in subsequent refactor**.
+- **Notebooks (Figs 4, 5, 6)**: config/validation cell added ✓ (still in effect; imports `TENSOR_PARALLEL_SIZE`, queries `nvidia-smi`, sets per-launcher env var). Fig 2 cell was not added.
 
 ## Directory renames: `models/` → `model_outputs/`, `models_download/` → `models/`
 

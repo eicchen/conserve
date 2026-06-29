@@ -19,7 +19,9 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, TENSOR_PARALLEL_SIZE
+import sys
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, TENSOR_PARALLEL_SIZE, PROFILE
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -32,9 +34,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 L_VALUES = [128, 256, 512, 1024, 2048, 4096, 6144, 8192, 10240, 12288,
             16384, 20480, 24576, 28672, 32768, 40960, 49152, 57344, 65536]
 N_PROMPTS_PER_L = 100
-# rope_scaling factor 2.5 -> max_model_len = 32768 * 2.5 = 81920 (>= 65536 + 2 slack)
-ROPE_FACTOR = 2.5
-MAX_MODEL_LEN = 81920
+MAX_MODEL_LEN = 81920  # 2.5× native 32K; covers L_VALUES up to 65536
 
 # L values that have their own prompts_{L}x2048.json file.
 HAVE_FILES = {128, 256, 512, 1024, 2048, 4096, 6144, 8192, 10240, 12288,
@@ -74,22 +74,23 @@ def main():
         model=MODEL,
         dtype="auto",
         download_dir=str(MODEL_DIR),
-        rope_scaling={"rope_type": "dynamic", "factor": ROPE_FACTOR},
         max_num_batched_tokens=max(L_VALUES) + 2048,
         max_num_seqs=4,
-        max_model_len=MAX_MODEL_LEN,
         enforce_eager=True,
         enable_prefix_caching=False,
         tensor_parallel_size=TENSOR_PARALLEL_SIZE,
+        max_model_len=MAX_MODEL_LEN,
+        **({"rope_scaling": {"rope_type": "dynamic", "factor": MAX_MODEL_LEN / PROFILE.native_ctx}}
+           if MAX_MODEL_LEN > PROFILE.native_ctx else {}),
     )
     sp = SamplingParams(
         temperature=1.2, top_p=1.0, max_tokens=2,
-        logit_bias={151643: -100, 151644: -100, 151645: -100},
+        logit_bias={tid: -100 for tid in PROFILE.eos_token_ids},
     )
 
     plan = {"model": MODEL, "L_values": list(my_L),
             "n_prompts_per_L": N_PROMPTS_PER_L,
-            "rope_factor": ROPE_FACTOR, "max_model_len": MAX_MODEL_LEN,
+            "max_model_len": MAX_MODEL_LEN,
             "cells": []}
 
     tokenizer = llm.get_tokenizer()

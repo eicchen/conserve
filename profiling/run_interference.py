@@ -34,7 +34,8 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE, PROFILE
 
 
 import aiohttp
@@ -76,10 +77,9 @@ def start_server():
         "--host", "localhost",
         "--port", str(PORT),
         "--download-dir", str(MODEL_DIR),
-        "--rope-scaling", '{"rope_type":"dynamic","factor":2.0}',
+        *PROFILE.vllm_serve_flags,
         "--max-num-batched-tokens", "33792",
         "--max-num-seqs", "128",
-        "--disable-log-requests",
         "--enforce-eager",
         "--enable-prefix-caching",
         "--engine-log-file", str(OUT / "server_engine.jsonl"),
@@ -155,7 +155,7 @@ async def submit(session, request_id, prompt, max_tokens):
         "temperature": 1.2,
         "top_p": 1.0,
         "stream": False,
-        "logit_bias": {"151643": -100, "151644": -100, "151645": -100},
+        "logit_bias": {str(tid): -100 for tid in PROFILE.eos_token_ids},
         "request_id": request_id,
     }
     url = f"http://localhost:{PORT}/v1/completions"

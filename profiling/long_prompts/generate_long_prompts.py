@@ -5,8 +5,10 @@ Each output file contains exactly 2048 prompts, each tokenizing to exactly L
 tokens under the active model's tokenizer. Prompts are built by cyclically
 concatenating the 8192-token seed file and trimming to L tokens.
 
-Reads:  models/<MODEL_SHORT>/long_prompts/prompts_8192x2048.json  (seed file)
-Writes: models/<MODEL_SHORT>/long_prompts/prompts_{L}x2048.json   (one per target length)
+Reads:  profiling/long_prompts/prompts_8192x2048.json  (seed file — shared across models)
+Writes: model_outputs/<MODEL_SHORT>/long_prompts/prompts_{L}x2048.json  (one per target length)
+Also copies the seed to model_outputs/<MODEL_SHORT>/long_prompts/ so profiling scripts can
+read prompts_8192x2048.json from MODEL_DATA_DIR/long_prompts/ alongside generated files.
 
 Run from the repo root or profiling/ directory:
     python profiling/long_prompts/generate_long_prompts.py
@@ -17,13 +19,16 @@ Override targets via --targets:
 
 import argparse
 import json
+import shutil
 import sys
 from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-sys.path.insert(0, str(REPO_ROOT / "profiling"))
+sys.path.insert(0, str(REPO_ROOT / "config"))
 from config import MODEL, MODEL_DIR, MODEL_SHORT, MODEL_DATA_DIR
+
+SEED_PATH = REPO_ROOT / "profiling" / "long_prompts" / "prompts_8192x2048.json"
 
 # Mirrors the full set in the reference data/profiling/ directory.
 # 8192 is excluded — it is the seed file, not generated.
@@ -58,14 +63,18 @@ def main():
     out_dir = MODEL_DATA_DIR / "long_prompts"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    seed_path = out_dir / "prompts_8192x2048.json"
-    if not seed_path.exists():
+    if not SEED_PATH.exists():
         raise FileNotFoundError(
-            f"Seed file not found: {seed_path}\n"
-            f"Ensure models/{MODEL_SHORT}/long_prompts/prompts_8192x2048.json exists."
+            f"Seed file not found: {SEED_PATH}\n"
+            f"Place prompts_8192x2048.json in profiling/long_prompts/."
         )
 
-    seed = json.loads(seed_path.read_text())
+    dst = out_dir / "prompts_8192x2048.json"
+    if not dst.exists() or dst.stat().st_mtime < SEED_PATH.stat().st_mtime:
+        shutil.copy2(SEED_PATH, dst)
+        print(f"[{MODEL_SHORT}] copied seed → {dst}")
+
+    seed = json.loads(SEED_PATH.read_text())
     assert len(seed) == 2048, f"expected 2048 seed prompts, got {len(seed)}"
 
     seed_ids = [tok.encode(p["prompt"], add_special_tokens=False) for p in seed]

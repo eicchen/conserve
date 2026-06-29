@@ -25,7 +25,7 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-import sys; sys.path.insert(0, str(REPO_ROOT / "profiling"))
+import sys; sys.path.insert(0, str(REPO_ROOT / "config"))
 from config import GPU_MON_ROOT, MODEL_SHORT, MODEL_DATA_DIR
 
 import warnings

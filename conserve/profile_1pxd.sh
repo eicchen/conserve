@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # To switch models, edit config.env at the repo root (or set MODEL= before running).
-source "$SCRIPT_DIR/../config.sh"
+source "$SCRIPT_DIR/../config/config.sh"
 MAX_NUM_BATCHED_TOKENS=2944
 
 ensure_arg_exists() {
@@ -206,13 +206,13 @@ launch_disagg_proxy_engines() {
 launch_engines() {
     local log_dir=$1
 
-    CUDA_VISIBLE_DEVICES=$(gpu_range ${PREFILLER_DEVICE_ID}) \
+    CUDA_VISIBLE_DEVICES=${PREFILLER_DEVICE_ID} \
         vllm serve "$MODEL" \
         --port 7100 \
         --dtype auto \
         --trust-remote-code \
         --download-dir "$MODEL_DIR" \
-        --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
+        "${VLLM_SERVE_FLAGS[@]}" \
         --max-num-batched-tokens "$MAX_NUM_BATCHED_TOKENS" \
         --max-num-seqs 1024 \
         --enforce-eager \
@@ -224,13 +224,13 @@ launch_engines() {
 
     for device in "${DECODER_DEVICES_ARR[@]}"; do
         echo "Decoder device: $device"
-        CUDA_VISIBLE_DEVICES=$(gpu_range $device) \
+        CUDA_VISIBLE_DEVICES=$device \
             vllm serve "$MODEL" \
             --port $((7199 + device)) \
             --dtype auto \
             --trust-remote-code \
             --download-dir "$MODEL_DIR" \
-            --rope-scaling '{"rope_type":"dynamic","factor":2.0}' \
+            "${VLLM_SERVE_FLAGS[@]}" \
             --max-num-batched-tokens "$MAX_NUM_BATCHED_TOKENS" \
             --max-num-seqs 1024 \
             --enforce-eager \

@@ -5,6 +5,7 @@ import os
 os.environ["VLLM_ENABLE_V1_MULTIPROCESSING"] = "0"
 
 import signal
+import sys
 from vllm import LLM, SamplingParams
 import json
 import subprocess
@@ -13,34 +14,33 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL, TENSOR_PARALLEL_SIZE
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import MODEL_DIR, MODEL_DATA_DIR, GPU_MON_ROOT, MODEL, TENSOR_PARALLEL_SIZE, PROFILE
 
 import time
 
 # MODEL_PATH = "meta-llama/Meta-Llama-3-8B-Instruct"  # local override
 MODEL_PATH = MODEL
 MODEL_SUFFIX = MODEL_PATH.split("/")[-1]
+MAX_MODEL_LEN = 65536  # 2× native 32K; sufficient for decode-grid batch sizes
 LLM_ARGS = {
     'model': MODEL_PATH,
     'dtype': "auto",
     'trust_remote_code': True,
     'download_dir': str(MODEL_DIR),
-    'rope_scaling': {"rope_type": "dynamic", "factor": 2.0},
     'max_num_batched_tokens': 16384*2,
     'max_num_seqs': 1024,
     'enforce_eager': True,
     'tensor_parallel_size': TENSOR_PARALLEL_SIZE,
+    'max_model_len': MAX_MODEL_LEN,
+    **({'rope_scaling': {'rope_type': 'dynamic', 'factor': MAX_MODEL_LEN / PROFILE.native_ctx}}
+       if MAX_MODEL_LEN > PROFILE.native_ctx else {}),
 }
 SAMPLING_PARAMS_ARGS = {
     'temperature': 1.2,
     'top_p': 1.0,
     'max_tokens': 1,
-    'logit_bias': {
-        2: -100,       # <eos>
-        13: -100,      # newline
-        128001: -100,  # <|end|>
-        128009: -100   # <|stop|>
-    },
+    'logit_bias': {tid: -100 for tid in PROFILE.eos_token_ids},
 }
 DCGMI_CMD = [
     "bash", "-c",

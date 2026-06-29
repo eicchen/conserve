@@ -17,7 +17,7 @@ import sys
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-sys.path.insert(0, str(REPO_ROOT / "profiling"))
+sys.path.insert(0, str(REPO_ROOT / "config"))
 from config import MODEL_SHORT, MODEL_DATA_DIR
 
 import numpy as np

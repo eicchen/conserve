@@ -2,11 +2,13 @@ import signal
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
-import sys
-sys.path.insert(0, str(Path(__file__).parent))
-from config import GPU_MON_ROOT, MODEL_DATA_DIR, MODEL_DIR, MODEL, MODEL_SHORT
+REPO_ROOT = next(p for p in Path(__file__).resolve().parents
+                 if (p / ".conserve_root").exists())
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import GPU_MON_ROOT, MODEL_DATA_DIR, MODEL_DIR, MODEL, MODEL_SHORT, PROFILE
 
 import time
 import requests
@@ -35,12 +37,7 @@ payload = {
     "temperature": 1.2,
     "top_p": 1.0,
     "stream": False,
-    "logit_bias": {
-        2: -100,
-        13: -100,
-        128001: -100,
-        128009: -100,
-    },
+    "logit_bias": {str(tid): -100 for tid in PROFILE.eos_token_ids},
 }
 
 prompt_file = in_dir / f"prompts_{in_token_size}x2048.json"

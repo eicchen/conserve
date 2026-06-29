@@ -6,7 +6,7 @@
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../config.sh"
+source "$SCRIPT_DIR/../config/config.sh"
 PY="${PY:-$(which python3)}"
 MODEL_SHORT="${MODEL##*/}"
 OUT_DIR="${OUT_DIR:-$REPO_ROOT/model_outputs/$MODEL_SHORT/paper/section3/profiling/prefill_profile_data}"
@@ -26,7 +26,7 @@ for GPU in 1 2 3; do
     L_LIST="${SHARDS[$GPU]}"
     LOG="$OUT_DIR/launcher_gpu${GPU}.log"
     echo "GPU $GPU  ←  L = ${L_LIST}"
-    CUDA_VISIBLE_DEVICES=$(gpu_range $GPU) "$PY" "$SCRIPT_DIR/run_prefill_profile.py" \
+    CUDA_VISIBLE_DEVICES=$GPU "$PY" "$SCRIPT_DIR/run_prefill_profile.py" \
         --L-list "$L_LIST" > "$LOG" 2>&1 &
     PIDS+=($!)
     LOGS+=("$LOG")

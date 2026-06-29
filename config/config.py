@@ -1,8 +1,13 @@
 import os
+try:
+    import tomllib as _toml
+except ImportError:
+    import tomli as _toml
+from dataclasses import dataclass, field
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).parent.parent
-_ENV_FILE = _REPO_ROOT / "config.env"
+_ENV_FILE = _REPO_ROOT / "config" / "config.env"
 
 
 def _load_config_env():
@@ -22,7 +27,7 @@ _cfg = _load_config_env()
 
 
 def _get(key, fallback=None):
-    # config.env is primary — not the inherited shell environment
+    # config/config.env is primary — not the inherited shell environment
     return _cfg.get(key, fallback)
 
 
@@ -50,3 +55,29 @@ os.environ["MODEL_DATA_DIR"] = str(MODEL_DATA_DIR)
 os.environ["GPU_TYPE"] = str(GPU_TYPE)
 os.environ["GPU_MON_ROOT"] = str(GPU_MON_ROOT)
 os.environ["TENSOR_PARALLEL_SIZE"] = str(TENSOR_PARALLEL_SIZE)
+
+
+# ---------------------------------------------------------------------------
+# Model profile registry
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ModelProfile:
+    native_ctx: int
+    eos_token_ids: list
+    vllm_serve_flags: list = field(default_factory=list)
+
+
+_PROFILES_FILE = _REPO_ROOT / "config" / "model_specific_configs.toml"
+with open(_PROFILES_FILE, "rb") as _f:
+    _PROFILES = {k: ModelProfile(**v) for k, v in _toml.load(_f)["models"].items()}
+
+PROFILE = _PROFILES[MODEL]
+
+
+if __name__ == "__main__":
+    import shlex
+    import sys
+    if "--sh-vars" in sys.argv:
+        flags = " ".join(shlex.quote(f) for f in PROFILE.vllm_serve_flags)
+        print(f"VLLM_SERVE_FLAGS=({flags})")

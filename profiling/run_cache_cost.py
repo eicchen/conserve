@@ -22,7 +22,8 @@ from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
-from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import MODEL_DIR, MODEL_DATA_DIR, MODEL, MODEL_SHORT, TENSOR_PARALLEL_SIZE, PROFILE
 
 
 os.environ.setdefault("VLLM_ENABLE_V1_MULTIPROCESSING", "0")
@@ -75,22 +76,24 @@ def build_prompt(cell_idx: int, L: int, tokenizer) -> str:
 
 
 def main():
+    MAX_MODEL_LEN = 81920  # 2.5× native 32K; covers L_VALUES up to 65536
     llm = LLM(
         model=MODEL,
         dtype="auto",
         download_dir=str(MODEL_DIR),
-        rope_scaling={"rope_type": "dynamic", "factor": 2.5},
         max_num_batched_tokens=67584,
         max_num_seqs=64,
-        max_model_len=81920,
         enforce_eager=True,
         enable_prefix_caching=True,
         tensor_parallel_size=TENSOR_PARALLEL_SIZE,
+        max_model_len=MAX_MODEL_LEN,
+        **({"rope_scaling": {"rope_type": "dynamic", "factor": MAX_MODEL_LEN / PROFILE.native_ctx}}
+           if MAX_MODEL_LEN > PROFILE.native_ctx else {}),
     )
     tokenizer = llm.get_tokenizer()
     sp = SamplingParams(
         temperature=1.2, top_p=1.0, max_tokens=2,
-        logit_bias={151643: -100, 151644: -100, 151645: -100},
+        logit_bias={tid: -100 for tid in PROFILE.eos_token_ids},
     )
 
     # Warmup: discarded generations so the first measured cell doesn't pay

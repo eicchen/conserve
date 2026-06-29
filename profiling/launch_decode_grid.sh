@@ -14,7 +14,7 @@
 _d="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 while [ "$_d" != "/" ] && [ ! -e "$_d/.conserve_root" ]; do _d="$(dirname "$_d")"; done
 REPO_ROOT="$_d"
-source "$REPO_ROOT/config.sh"
+source "$REPO_ROOT/config/config.sh"
 
 set -euo pipefail
 
@@ -45,7 +45,7 @@ for SHARD in "${!GPUS_ARR[@]}"; do
     # effect. Under MPClient the engine subprocess has its own observability
     # config and the log path never reaches it.
     VLLM_ENABLE_V1_MULTIPROCESSING=0 \
-    CUDA_VISIBLE_DEVICES=$(gpu_range $GPU) "$PY" "$SCRIPT_DIR/run_decode_grid.py" \
+    CUDA_VISIBLE_DEVICES=$GPU "$PY" "$SCRIPT_DIR/run_decode_grid.py" \
         --out-dir "$OUT_DIR" \
         --shard-idx $SHARD \
         --num-shards $NUM_SHARDS \
