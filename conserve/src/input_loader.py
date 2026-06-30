@@ -1,13 +1,16 @@
 import json
+import sys
 import aiohttp
 from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import BENCHMARK_TRACE_DIR
 
 
 # ── File paths ────────────────────────────────────────────────────────────────
-PROMPTS_FILE = f"{REPO_ROOT}/conserve/input/mini_swe_agent_trace.json"
+PROMPTS_FILE = str(BENCHMARK_TRACE_DIR / "mini_swe_agent_trace.json")
 COMPOUND_PROMPTS_FILE = f"{REPO_ROOT}/conserve/input/compound_prompts.json"
 OUT_DCGMI_FILE = "dcgmi_trace.tsv"
 LATENCY_LOG_FILE = "per_step_latency.csv"

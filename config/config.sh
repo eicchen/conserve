@@ -19,7 +19,12 @@ fi
 [[ "$MODELS_ROOT" != /* ]] && MODELS_ROOT="$REPO_ROOT/$MODELS_ROOT"
 [[ "$GPU_MON_ROOT" != /* ]] && GPU_MON_ROOT="$REPO_ROOT/$GPU_MON_ROOT"
 
-export MODEL MODEL_DIR MODELS_ROOT GPU_TYPE GPU_MON_ROOT TENSOR_PARALLEL_SIZE PREFILLER_GPU_MEM_UTIL DECODER_GPU_MEM_UTIL
+# Derive compound paths not stored verbatim in config.env
+MODEL_SHORT="${MODEL##*/}"
+BENCHMARK="${BENCHMARK:-SWE-bench_bm25_13K}"
+BENCHMARK_TRACE_DIR="$MODELS_ROOT/$MODEL_SHORT/benchmarks/$BENCHMARK"
+
+export MODEL MODEL_SHORT MODEL_DIR MODELS_ROOT GPU_TYPE GPU_MON_ROOT TENSOR_PARALLEL_SIZE PREFILLER_GPU_MEM_UTIL DECODER_GPU_MEM_UTIL BENCHMARK BENCHMARK_TRACE_DIR
 
 # Load model-specific vLLM serve flags from model_specific_configs.toml.
 # config.sh requires Python 3 with tomli/tomllib available (satisfied by both

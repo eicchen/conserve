@@ -11,10 +11,13 @@ Outputs:
 """
 
 import json
+import sys
 from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import BENCHMARK_TRACE_DIR
 
 from collections import defaultdict
 
@@ -23,7 +26,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
-TRACE = (REPO_ROOT / "conserve/input/mini_swe_agent_trace.json")
+TRACE = BENCHMARK_TRACE_DIR / "mini_swe_agent_trace.json"
 OUT = (REPO_ROOT / "paper/figures/section3/output")
 
 

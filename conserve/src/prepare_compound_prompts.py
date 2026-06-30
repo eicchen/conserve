@@ -7,13 +7,16 @@ distinct, which is what we want for the prefix-cache simulation).
 """
 
 import json
+import sys
 from pathlib import Path
 
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
+sys.path.insert(0, str(REPO_ROOT / "config"))
+from config import BENCHMARK_TRACE_DIR
 
 
-INPUT  = Path(f'{REPO_ROOT}/conserve/input/mini_swe_agent_trace.json')
+INPUT  = BENCHMARK_TRACE_DIR / "mini_swe_agent_trace.json"
 OUTPUT = Path(f'{REPO_ROOT}/conserve/input/compound_prompts.json')
 TARGET_TOKENS = 25_000
 N_COMPOUND = 8

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-06-29 — Benchmark trace path restructure + fig1 self-contained notebook
+
+Moved `mini_swe_agent_trace.json` from `conserve/input/` into the per-model data tree; added `BENCHMARK` config key; expanded `fig1_trace_profile.ipynb` to cover the full data-collection pipeline inline.
+
+### Trace path restructure
+- `mini_swe_agent_trace.json` moved to `model_outputs/<MODEL_SHORT>/benchmark_trace/<BENCHMARK>/trace/`
+- `BENCHMARK=SWE-bench_bm25_13K` added to `config/config.env`; `BENCHMARK_TRACE_DIR = MODEL_DATA_DIR / "benchmark_trace" / BENCHMARK / "trace"` added to `config/config.py` (stamped into `os.environ`) and derived in `config/config.sh` (exported)
+- All consumers updated to import `BENCHMARK_TRACE_DIR` from `config/config.py`: `conserve/src/input_loader.py`, `src/prepare_compound_prompts.py`, `src/profile_agent.py`, `paper/figures/section3/scripts/plot_trace.py`
+- `CLAUDE.md` and `doc/PAPER_TO_CODE.md` updated to reflect new path
+
+### `fig1_trace_profile.ipynb` — self-contained pipeline
+- Notebook now covers all four steps inline: (1) download `princeton-nlp/SWE-bench_bm25_13K` via `load_dataset` with stale-cache detection; (2) flatten per-problem JSONs, compute `uncached_tokens`, Gutenberg-pad prompts, save to `BENCHMARK_TRACE_DIR`; (3) verify PUA-anchor prefix-caching defeat; (4) run `plot_trace.py`
+- `conserve/output/plot_dataset.ipynb` is now legacy for trace generation
+- `doc/PAPER_TO_CODE.md`: expanded Fig 1 data-collection description inline with step-by-step detail
+
 ## 2026-06-29 — Config/ folder + multi-model vLLM serve flags
 
 Moved `config.env`, `config.sh`, `profiling/config.py` into `config/` and eliminated all per-model hardcoding from launchers and profiling scripts.
