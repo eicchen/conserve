@@ -45,8 +45,9 @@ MODEL_DATA_DIR = MODELS_ROOT / MODEL_SHORT
 GPU_TYPE = _get("GPU_TYPE", "A40")
 GPU_MON_ROOT = _resolve_path("GPU_MON_ROOT", f"profiling/gpu_profiling/{GPU_TYPE}")
 TENSOR_PARALLEL_SIZE = int(_get("TENSOR_PARALLEL_SIZE", "1"))
-BENCHMARK = _get("BENCHMARK", "SWE-bench_bm25_13K")
-BENCHMARK_TRACE_DIR = MODEL_DATA_DIR / "benchmarks" / BENCHMARK
+BENCHMARK = _get("BENCHMARK", "princeton-nlp/SWE-bench_bm25_13K")
+BENCHMARK_SHORT = BENCHMARK.split("/")[-1]
+BENCHMARK_TRACE_DIR = MODEL_DATA_DIR / "benchmarks" / BENCHMARK_SHORT
 
 # Stamp the values back into os.environ so subprocesses (e.g. bash scripts
 # launched from a notebook) see the file-derived values, not stale shell vars.
@@ -58,6 +59,7 @@ os.environ["GPU_TYPE"] = str(GPU_TYPE)
 os.environ["GPU_MON_ROOT"] = str(GPU_MON_ROOT)
 os.environ["TENSOR_PARALLEL_SIZE"] = str(TENSOR_PARALLEL_SIZE)
 os.environ["BENCHMARK"] = BENCHMARK
+os.environ["BENCHMARK_SHORT"] = BENCHMARK_SHORT
 os.environ["BENCHMARK_TRACE_DIR"] = str(BENCHMARK_TRACE_DIR)
 
 

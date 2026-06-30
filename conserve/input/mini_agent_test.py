@@ -52,6 +52,7 @@ that is fast since the agent finishes in one pass).
 """
 
 import argparse
+import asyncio
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -68,7 +69,7 @@ REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 
 sys.path.insert(0, str(REPO_ROOT / "config"))
-from config import BENCHMARK, BENCHMARK_TRACE_DIR  # noqa: E402
+from config import BENCHMARK, BENCHMARK_TRACE_DIR, MODEL  # noqa: E402
 
 HF_CACHE_DIR = REPO_ROOT / "conserve" / "datasets"
 
@@ -80,8 +81,8 @@ MAX_WORKERS = 16
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--dataset", default="princeton-nlp/SWE-bench_bm25_13K",
-                   help="HuggingFace dataset path (default: princeton-nlp/SWE-bench_bm25_13K)")
+    p.add_argument("--dataset", default=BENCHMARK,
+                   help=f"HuggingFace dataset path (default: {BENCHMARK})")
     p.add_argument("--split", default="test",
                    help="Dataset split (default: test)")
     p.add_argument("--max-problems", type=int, default=None,
@@ -91,58 +92,44 @@ def parse_args():
     return p.parse_args()
 
 
-# --- async version (kept for reference) ---
-# async def run_task(item, idx, agent_factory, sem, executor, pbar, output_dir):
-#     async with sem:
-#         out_path = output_dir / f"output_{item.get('instance_id', idx)}_{idx}.json"
-#         agent = agent_factory(out_path)
-#         loop = asyncio.get_event_loop()
-#         try:
-#             await loop.run_in_executor(
-#                 executor,
-#                 lambda: agent.run(item["problem_statement"], context=item["text"]),
-#             )
-#         except Exception as e:
-#             print(f"\nSkipping {item.get('instance_id', idx)}: {type(e).__name__}: {e}",
-#                   flush=True)
-#         pbar.update(1)
-#
-# async def main():
-#     ...
-#     sem      = asyncio.Semaphore(MAX_WORKERS)
-#     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-#     await asyncio.gather(*[run_task(...) for idx, item in enumerate(dataset)])
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
-# ------------------------------------------
-
-
-def run_task(item, idx, agent_factory, pbar, output_dir):
+async def run_task(item, idx, agent_factory, sem, executor, pbar, output_dir):
     """Run one SWE-bench problem through a fresh DefaultAgent, writing the
-    per-problem trace JSON to output_dir."""
-    out_path = output_dir / f"output_{item.get('instance_id', idx)}_{idx}.json"
-    agent = agent_factory(out_path)
-    try:
-        agent.run(item["problem_statement"], context=item["text"])
-    except Exception as e:
-        print(f"\nSkipping {item.get('instance_id', idx)}: {type(e).__name__}: {e}",
-              flush=True)
-    pbar.update(1)
+    per-problem trace JSON to output_dir. Bounded by `sem` for concurrency."""
+    async with sem:
+        out_path = output_dir / f"output_{item.get('instance_id', idx)}_{idx}.json"
+        agent = agent_factory(out_path)
+        loop = asyncio.get_event_loop()
+        try:
+            await loop.run_in_executor(
+                executor,
+                lambda: agent.run(item["problem_statement"], context=item["text"]),
+            )
+        except Exception as e:
+            print(f"\nSkipping {item.get('instance_id', idx)}: {type(e).__name__}: {e}",
+                  flush=True)
+        pbar.update(1)
 
 
-def main():
+async def main():
     args = parse_args()
     output_dir = BENCHMARK_TRACE_DIR / "swe_output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     config = get_config_from_spec("swebench")
-    model  = get_model(config=config.get("model", {}))
-    env    = LocalEnvironment(**config.get("environment", {}))
+
+    # Override model to use local vLLM endpoint instead of the Anthropic API
+    # that the upstream swebench spec targets.
+    model_config = config.get("model", {})
+    model_config["model_name"] = f"openai/{MODEL}"
+    model_config.setdefault("model_kwargs", {}).update({
+        "api_base": "http://localhost:8000/v1",
+        "api_key": "dummy",
+    })
+    model = get_model(config=model_config)
+    env   = LocalEnvironment(**config.get("environment", {}))
 
     agent_kwargs = config.get("agent", {})
     if args.max_turns is not None:
-        # swebench spec uses "step_limit", not "max_steps"
         agent_kwargs = {**agent_kwargs, "step_limit": args.max_turns}
 
     def agent_factory(out_path: Path) -> DefaultAgent:
@@ -157,18 +144,18 @@ def main():
     if args.max_problems is not None:
         dataset = dataset.select(range(min(args.max_problems, len(dataset))))
 
-    pbar = tqdm(total=len(dataset), desc=f"{args.dataset} -> {output_dir.name}")
+    sem      = asyncio.Semaphore(MAX_WORKERS)
+    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+    pbar     = tqdm(total=len(dataset), desc=f"{args.dataset} -> {output_dir.name}")
     try:
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            futures = [
-                executor.submit(run_task, item, idx, agent_factory, pbar, output_dir)
-                for idx, item in enumerate(dataset)
-            ]
-            for f in futures:
-                f.result()
+        await asyncio.gather(*[
+            run_task(item, idx, agent_factory, sem, executor, pbar, output_dir)
+            for idx, item in enumerate(dataset)
+        ])
     finally:
         pbar.close()
+        executor.shutdown()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
