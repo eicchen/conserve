@@ -9,7 +9,7 @@
 #SBATCH --error=sbatch/fig1/logs/fig1_trace_%j.err
 #
 # Submit from the repo root so the relative --output/--error paths above resolve:
-#   sbatch sbatch/fig1/run_fig1_trace.sbatch [BENCHMARK] [SPLIT] [MAX_PROBLEMS] [MAX_TURNS]
+#   sbatch sbatch/fig1/run_fig1_trace.sbatch [BENCHMARK] [SPLIT] [MAX_PROBLEMS] [MAX_TURNS] [RESUME]
 #
 # Stitches the 3-shell workflow described in
 # paper/figures/section3/notebooks/fig1_trace_profile.ipynb into one batch
@@ -58,6 +58,9 @@
 #   SPLIT         Dataset split (default: test)
 #   MAX_PROBLEMS  Cap problems for a quick smoke test (default: unset = full sweep)
 #   MAX_TURNS     Cap agent turns/problem for a quick smoke test (default: unset)
+#   RESUME        Any non-empty value passes --resume to mini_agent_test.py,
+#                 skipping tasks whose output already reached a terminal state
+#                 (default: unset = always rerun everything, matching prior behavior)
 #
 # Examples
 #   sbatch sbatch/fig1/run_fig1_trace.sbatch
@@ -95,6 +98,7 @@ BENCHMARK_OVERRIDE="${1:-}"
 SPLIT="${2:-test}"
 MAX_PROBLEMS="${3:-}"
 MAX_TURNS="${4:-}"
+RESUME="${5:-}"
 
 # Job-private config.env copy — never edit the shared repo file, so
 # concurrently submitted jobs (e.g. different BENCHMARK per job) don't race.
@@ -126,6 +130,7 @@ done
 echo "MODEL=$MODEL  BENCHMARK=$BENCHMARK  SPLIT=$SPLIT  VLLM_PORT=$VLLM_PORT"
 echo "Job config: $JOB_CONFIG_ENV"
 [[ -n "$MAX_PROBLEMS" ]] && echo "MAX_PROBLEMS=$MAX_PROBLEMS  MAX_TURNS=$MAX_TURNS  (smoke test)"
+[[ -n "$RESUME" ]] && echo "RESUME=1 (skipping already-completed tasks)"
 
 # ── Shell 1 (backgrounded) — serve the model ────────────────────────────────
 VLLM_LOG="$BENCH_LOG_DIR/vllm_serve_${SLURM_JOB_ID:-local}.log"
@@ -166,6 +171,7 @@ echo "vLLM server healthy."
 AGENT_ARGS=(--dataset "$BENCHMARK" --split "$SPLIT")
 [[ -n "$MAX_PROBLEMS" ]] && AGENT_ARGS+=(--max-problems "$MAX_PROBLEMS")
 [[ -n "$MAX_TURNS" ]] && AGENT_ARGS+=(--max-turns "$MAX_TURNS")
+[[ -n "$RESUME" ]] && AGENT_ARGS+=(--resume)
 
 python "$SCRIPT_DIR/mini_agent_test.py" "${AGENT_ARGS[@]}"
 

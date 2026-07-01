@@ -53,6 +53,7 @@ that is fast since the agent finishes in one pass).
 
 import argparse
 import asyncio
+import json
 import shutil
 import sys
 import tempfile
@@ -101,7 +102,29 @@ def parse_args():
                    help="Stop after this many problems (default: all)")
     p.add_argument("--max-turns", type=int, default=None,
                    help="Cap agent turns per problem (default: unlimited)")
+    p.add_argument("--resume", action="store_true",
+                   help="Skip tasks whose output already reached a terminal "
+                        "state (for resuming after a Slurm time-limit kill). "
+                        "Only safe across runs with the same --dataset/--split "
+                        "and an unchanged-or-larger --max-problems.")
     return p.parse_args()
+
+
+def _task_output_is_done(out_path: Path) -> bool:
+    """True if out_path holds a trajectory that reached a terminal state
+    (last message role == "exit"). Missing, unreadable, or truncated files
+    are treated as not-done so they get rerun. DefaultAgent.save() writes
+    out_path after every turn, not just at the end, so existence alone
+    doesn't mean the task finished."""
+    if not out_path.exists():
+        return False
+    try:
+        with open(out_path) as fh:
+            data = json.load(fh)
+        messages = data.get("messages", [])
+        return bool(messages) and messages[-1].get("role") == "exit"
+    except (json.JSONDecodeError, OSError):
+        return False
 
 
 @contextmanager
@@ -134,21 +157,26 @@ def task_workspace(base_cwd: str, task_id: str, task):
 
 async def run_task(task, idx, agent_factory, sem, executor, pbar, output_dir, base_cwd):
     """Run one benchmark task through a fresh DefaultAgent, writing the
-    per-problem trace JSON to output_dir. Bounded by `sem` for concurrency."""
+    per-problem trace JSON to output_dir. Bounded by `sem` for concurrency.
+
+    The try/except spans workspace setup (task_workspace's checkout_task_repo
+    can fail, e.g. an unreachable base_commit) through the agent run, so one
+    bad task is skipped and logged instead of propagating out of gather()
+    and killing every other concurrently running task."""
     async with sem:
         task_id = f"{task.instance_id}_{idx}"
         out_path = output_dir / f"output_{task_id}.json"
-        with task_workspace(base_cwd, task_id, task) as task_cwd:
-            agent = agent_factory(out_path, task_cwd)
-            loop = asyncio.get_event_loop()
-            try:
+        try:
+            with task_workspace(base_cwd, task_id, task) as task_cwd:
+                agent = agent_factory(out_path, task_cwd)
+                loop = asyncio.get_event_loop()
                 await loop.run_in_executor(
                     executor,
                     lambda: agent.run(task.prompt),
                 )
-            except Exception as e:
-                print(f"\nSkipping {task.instance_id}: {type(e).__name__}: {e}",
-                      flush=True)
+        except Exception as e:
+            print(f"\nSkipping {task.instance_id}: {type(e).__name__}: {e}",
+                  flush=True)
         pbar.update(1)
 
 
@@ -203,13 +231,27 @@ async def main():
 
     tasks = loader(args.dataset, args.split, HF_CACHE_DIR, args.max_problems)
 
+    indexed_tasks = list(enumerate(tasks))
+    n_done = 0
+    if args.resume:
+        remaining = []
+        for idx, task in indexed_tasks:
+            out_path = output_dir / f"output_{task.instance_id}_{idx}.json"
+            if _task_output_is_done(out_path):
+                n_done += 1
+            else:
+                remaining.append((idx, task))
+        indexed_tasks = remaining
+        print(f"--resume: {n_done}/{len(tasks)} tasks already done, "
+              f"{len(indexed_tasks)} remaining", flush=True)
+
     sem      = asyncio.Semaphore(MAX_WORKERS)
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-    pbar     = tqdm(total=len(tasks), desc=f"{args.dataset} -> {output_dir.name}")
+    pbar     = tqdm(total=len(tasks), initial=n_done, desc=f"{args.dataset} -> {output_dir.name}")
     try:
         await asyncio.gather(*[
             run_task(task, idx, agent_factory, sem, executor, pbar, output_dir, base_cwd)
-            for idx, task in enumerate(tasks)
+            for idx, task in indexed_tasks
         ])
     finally:
         pbar.close()

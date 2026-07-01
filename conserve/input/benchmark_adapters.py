@@ -107,9 +107,26 @@ def _ensure_repo_mirror(repo: str) -> Path:
 def checkout_task_repo(repo: str, base_commit: str, dest: Path) -> None:
     """Materialize `repo` at `base_commit` into `dest` as a detached git
     worktree off the shared local mirror — fast and network-free after the
-    mirror's first clone."""
+    mirror's first clone.
+
+    Some `base_commit`s aren't reachable from any branch/tag the mirror
+    fetched at clone time (e.g. the source PR branch was since deleted by
+    a squash-merge), even though GitHub still serves the object directly
+    by SHA. On a worktree-add failure, fetch that exact commit into the
+    mirror and retry once before giving up."""
     mirror_path = _ensure_repo_mirror(repo)
     dest.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        _worktree_add(mirror_path, dest, base_commit)
+    except subprocess.CalledProcessError:
+        subprocess.run(
+            ["git", "fetch", "origin", base_commit],
+            cwd=mirror_path, check=True, capture_output=True, text=True,
+        )
+        _worktree_add(mirror_path, dest, base_commit)
+
+
+def _worktree_add(mirror_path: Path, dest: Path, base_commit: str) -> None:
     subprocess.run(
         ["git", "worktree", "add", "--detach", str(dest), base_commit],
         cwd=mirror_path, check=True, capture_output=True, text=True,
