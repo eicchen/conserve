@@ -41,10 +41,11 @@
 # (deliberately left canonical/untouched, unlike config.py/config.sh/
 # mini_agent_test.py/build_agent_trace.py in this directory) always reads
 # BENCHMARK from the shared config/config.env — it does not honor this job's
-# CONSERVE_CONFIG_ENV override — and always writes to the same fixed
-# paper/figures/section3/output/trace_profile.{png,pdf} path. Running it from
-# two concurrent jobs would plot the wrong benchmark's data and/or clobber
-# each other's output file.
+# CONSERVE_CONFIG_ENV override — so it resolves BENCHMARK_TRACE_DIR (where it
+# both reads mini_swe_agent_trace.json and writes its plot/csv) off whatever
+# BENCHMARK the shared config.env currently has, not this job's own. Running
+# it from two concurrent jobs would plot the wrong benchmark's data and/or
+# clobber each other's output file.
 #
 # Arguments (all optional)
 # -------------------------

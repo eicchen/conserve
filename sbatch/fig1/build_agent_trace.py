@@ -51,10 +51,19 @@ def build_trace():
     if not files:
         sys.exit(f"No JSON files found in {SWE_OUTPUT_DIR}")
 
+    skipped_incomplete = 0
     for file_path in files:
         with open(file_path) as fh:
             data = json.load(fh)
-        asst = [m for m in data["messages"] if m["role"] == "assistant"]
+        messages = data.get("messages", [])
+        if not messages or messages[-1].get("role") != "exit":
+            # Trajectory hasn't reached a terminal state (e.g. the job was
+            # killed by Slurm's time limit mid-turn) — its token counts
+            # aren't representative of a finished conversation, so leave it
+            # out until a later --resume run finishes it.
+            skipped_incomplete += 1
+            continue
+        asst = [m for m in messages if m["role"] == "assistant"]
         usage = [m["extra"]["response"]["usage"] for m in asst]
         conv_id = int(file_path.stem.split("_")[-1])
         for i, u in enumerate(usage):
@@ -83,7 +92,8 @@ def build_trace():
     TRACE_PATH.parent.mkdir(parents=True, exist_ok=True)
     TRACE_PATH.write_text(json.dumps(records))
     n_convs = len({r["conv_id"] for r in records})
-    print(f"Saved {len(records)} records ({n_convs} conversations) → {TRACE_PATH}")
+    skip_note = f" ({skipped_incomplete} incomplete trajectories skipped)" if skipped_incomplete else ""
+    print(f"Saved {len(records)} records ({n_convs} conversations) → {TRACE_PATH}{skip_note}")
 
 
 def main():

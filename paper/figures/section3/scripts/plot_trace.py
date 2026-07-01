@@ -5,9 +5,11 @@ Single panel, x-axis = turn index; at each turn two paired violins:
   Appended input tokens (turn-1: prompt; turn-2+: new chunk)
   Output tokens
 
-Outputs:
-  trace_profile.{pdf,png}
-  trace_profile_summary.csv
+Outputs (written to BENCHMARK_TRACE_DIR, alongside mini_swe_agent_trace.json —
+same per-benchmark model_outputs dir the trace was read from, so plotting
+benchmarks one after another doesn't overwrite each other's output):
+  trace_profile_<BENCHMARK_SHORT>.png
+  trace_profile_summary_<BENCHMARK_SHORT>.csv
 """
 
 import json
@@ -17,7 +19,7 @@ from pathlib import Path
 REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 sys.path.insert(0, str(REPO_ROOT / "config"))
-from config import BENCHMARK_TRACE_DIR
+from config import BENCHMARK_SHORT, BENCHMARK_TRACE_DIR
 
 from collections import defaultdict
 
@@ -27,7 +29,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 
 TRACE = BENCHMARK_TRACE_DIR / "mini_swe_agent_trace.json"
-OUT = (REPO_ROOT / "paper/figures/section3/output")
+OUT = BENCHMARK_TRACE_DIR
+# Suffixed with BENCHMARK_SHORT for consistency with the old shared-output-dir
+# naming, even though OUT is now already per-benchmark.
+PNG_PATH = OUT / f"trace_profile_{BENCHMARK_SHORT}.png"
+CSV_PATH = OUT / f"trace_profile_summary_{BENCHMARK_SHORT}.csv"
 
 
 def load_trace():
@@ -60,7 +66,7 @@ def load_trace():
 
 def main():
     df = load_trace()
-    df.to_csv(OUT / "trace_profile_summary.csv", index=False)
+    df.to_csv(CSV_PATH, index=False)
     print(f"loaded {len(df)} turns across {df['conv_id'].nunique()} convs")
     summary = (df.groupby("iter_id")
                  .agg(n=("conv_id", "size"),
@@ -131,9 +137,8 @@ def main():
               bbox_to_anchor=(0.5, 1.02), ncol=2, fontsize=11, frameon=False)
 
     fig.tight_layout()
-    # fig.savefig(OUT / "trace_profile.pdf", dpi=200)
-    fig.savefig(OUT / "trace_profile.png", dpi=200)
-    print(f"\nSaved trace_profile.pdf / .png and trace_profile_summary.csv")
+    fig.savefig(PNG_PATH, dpi=200)
+    print(f"\nSaved {PNG_PATH.name} and {CSV_PATH.name}")
 
 
 if __name__ == "__main__":
