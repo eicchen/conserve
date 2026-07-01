@@ -1,0 +1,47 @@
+# Config spec for standalone competitive-programming problems (no repo, no
+# PR, no git diff) — the shipped minisweagent swebench.yaml template assumes
+# a repo to patch, which doesn't apply here.
+agent:
+  system_template: |
+    You are a helpful assistant that can interact with a computer shell to solve competitive programming problems.
+  instance_template: |
+    <problem>
+    {{task}}
+    </problem>
+
+    <instructions>
+    Write a Python solution to the problem above.
+
+    1. Create `solution.py` in the current directory implementing the solution.
+       Read input from stdin and write output to stdout, matching the test case format shown above.
+    2. Test your solution against the public test cases shown above by running it manually with sample input.
+    3. Iterate until your solution passes all shown public test cases.
+    4. When done, submit by running this exact command:
+
+    ```bash
+    echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT && cat solution.py
+    ```
+
+    Do not combine the submit command with any other command. You cannot continue working after submitting.
+    </instructions>
+  step_limit: 50
+  cost_limit: 3.
+environment:
+  cwd: "/tmp/lcb_workspace"
+  timeout: 60
+  env:
+    PAGER: cat
+    MANPAGER: cat
+    LESS: -R
+model:
+  observation_template: |
+    <returncode>{{output.returncode}}</returncode>
+    <output>
+    {{ output.output }}
+    </output>
+  format_error_template: |
+    Tool call error:
+    <error>
+    {{error}}
+    </error>
+    Every response needs to use the bash tool at least once with a command.

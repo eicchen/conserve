@@ -53,11 +53,13 @@ that is fast since the agent finishes in one pass).
 
 import argparse
 import asyncio
+import shutil
 import sys
+import tempfile
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from pathlib import Path
 
-from datasets import load_dataset
 from tqdm import tqdm
 
 from minisweagent.agents.default import DefaultAgent
@@ -69,13 +71,23 @@ REPO_ROOT = next(p for p in Path(__file__).resolve().parents
                  if (p / ".conserve_root").exists())
 
 sys.path.insert(0, str(REPO_ROOT / "config"))
-from config import BENCHMARK, BENCHMARK_TRACE_DIR, MODEL  # noqa: E402
+from config import BENCHMARK, MODEL, MODEL_DATA_DIR  # noqa: E402
+
+from benchmark_adapters import checkout_task_repo, cleanup_task_repo, get_adapter
 
 HF_CACHE_DIR = REPO_ROOT / "conserve" / "datasets"
 
 # Parallelism for the agent runs. The bottleneck is usually the LLM endpoint,
 # not local CPU; tune to whatever your serving stack handles.
 MAX_WORKERS = 16
+
+
+def _non_negative_int(value):
+    """Argparse type validator that rejects negative integers."""
+    ivalue = int(value)
+    if ivalue < 0:
+        raise argparse.ArgumentTypeError(f"must be a non-negative integer, got {value!r}")
+    return ivalue
 
 
 def parse_args():
@@ -85,37 +97,72 @@ def parse_args():
                    help=f"HuggingFace dataset path (default: {BENCHMARK})")
     p.add_argument("--split", default="test",
                    help="Dataset split (default: test)")
-    p.add_argument("--max-problems", type=int, default=None,
+    p.add_argument("--max-problems", type=_non_negative_int, default=None,
                    help="Stop after this many problems (default: all)")
     p.add_argument("--max-turns", type=int, default=None,
                    help="Cap agent turns per problem (default: unlimited)")
     return p.parse_args()
 
 
-async def run_task(item, idx, agent_factory, sem, executor, pbar, output_dir):
-    """Run one SWE-bench problem through a fresh DefaultAgent, writing the
+@contextmanager
+def task_workspace(base_cwd: str, task_id: str, task):
+    """Create a per-task scratch directory under base_cwd, removing it on
+    exit regardless of how the task ends. Pairs creation and cleanup in one
+    place so a full sweep can't leave per-task directories behind. Yields
+    None when the benchmark config has no cwd to scope (nothing to create
+    or clean up).
+
+    For SWE-bench-family tasks (task.repo/task.base_commit set), the
+    directory is populated with an actual checkout of that repo at that
+    commit via checkout_task_repo, instead of being left empty."""
+    if not base_cwd:
+        yield None
+        return
+    path = Path(base_cwd) / task_id
+    if task.repo and task.base_commit:
+        checkout_task_repo(task.repo, task.base_commit, path)
+    else:
+        path.mkdir(parents=True, exist_ok=True)
+    try:
+        yield path
+    finally:
+        if task.repo and task.base_commit:
+            cleanup_task_repo(task.repo, path)
+        else:
+            shutil.rmtree(path, ignore_errors=True)
+
+
+async def run_task(task, idx, agent_factory, sem, executor, pbar, output_dir, base_cwd):
+    """Run one benchmark task through a fresh DefaultAgent, writing the
     per-problem trace JSON to output_dir. Bounded by `sem` for concurrency."""
     async with sem:
-        out_path = output_dir / f"output_{item.get('instance_id', idx)}_{idx}.json"
-        agent = agent_factory(out_path)
-        loop = asyncio.get_event_loop()
-        try:
-            await loop.run_in_executor(
-                executor,
-                lambda: agent.run(item["problem_statement"], context=item["text"]),
-            )
-        except Exception as e:
-            print(f"\nSkipping {item.get('instance_id', idx)}: {type(e).__name__}: {e}",
-                  flush=True)
+        task_id = f"{task.instance_id}_{idx}"
+        out_path = output_dir / f"output_{task_id}.json"
+        with task_workspace(base_cwd, task_id, task) as task_cwd:
+            agent = agent_factory(out_path, task_cwd)
+            loop = asyncio.get_event_loop()
+            try:
+                await loop.run_in_executor(
+                    executor,
+                    lambda: agent.run(task.prompt),
+                )
+            except Exception as e:
+                print(f"\nSkipping {task.instance_id}: {type(e).__name__}: {e}",
+                      flush=True)
         pbar.update(1)
 
 
 async def main():
     args = parse_args()
-    output_dir = BENCHMARK_TRACE_DIR / "swe_output"
+    # Output directory name follows whatever --dataset was actually run, not
+    # the static BENCHMARK in config/config.env, so ad-hoc runs against a
+    # different benchmark don't collide with another benchmark's outputs.
+    benchmark_short = args.dataset.split("/")[-1]
+    output_dir = MODEL_DATA_DIR / "benchmarks" / benchmark_short / "swe_output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    config = get_config_from_spec("swebench")
+    loader, config_spec = get_adapter(args.dataset)
+    config = get_config_from_spec(config_spec)
 
     # Override model to use local vLLM endpoint instead of the Anthropic API
     # that the upstream swebench spec targets.
@@ -126,31 +173,43 @@ async def main():
         "api_key": "dummy",
     })
     model = get_model(config=model_config)
-    env   = LocalEnvironment(**config.get("environment", {}))
+    env_config = config.get("environment", {})
+    # The configured cwd (e.g. /tmp/lcb_workspace, /testbed) isn't created by
+    # anything in this pipeline, and for SWE-bench-family configs is a
+    # top-level path (/testbed) a non-root user can't even mkdir. Rather
+    # than trust the literal configured path, only use it as a signal that
+    # this benchmark wants a scoped working directory at all, and redirect
+    # to a writable scratch root; task_workspace() then scopes a fresh
+    # subdirectory per task (MAX_WORKERS tasks run at once) so parallel
+    # agents don't clobber each other's files, and removes it when the task
+    # ends.
+    base_cwd = (str(Path(tempfile.gettempdir()) / "mini_agent_workspace" / benchmark_short)
+                if env_config.get("cwd") else "")
 
     agent_kwargs = config.get("agent", {})
     if args.max_turns is not None:
         agent_kwargs = {**agent_kwargs, "step_limit": args.max_turns}
 
-    def agent_factory(out_path: Path) -> DefaultAgent:
+    def agent_factory(out_path: Path, task_cwd: Path | None) -> DefaultAgent:
+        task_env_config = dict(env_config)
+        if task_cwd is not None:
+            task_env_config["cwd"] = str(task_cwd)
+        env = LocalEnvironment(**task_env_config)
         return DefaultAgent(
             model, env,
             **agent_kwargs,
             output_path=str(out_path),
         )
 
-    dataset = load_dataset(args.dataset, split=args.split,
-                           cache_dir=str(HF_CACHE_DIR))
-    if args.max_problems is not None:
-        dataset = dataset.select(range(min(args.max_problems, len(dataset))))
+    tasks = loader(args.dataset, args.split, HF_CACHE_DIR, args.max_problems)
 
     sem      = asyncio.Semaphore(MAX_WORKERS)
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-    pbar     = tqdm(total=len(dataset), desc=f"{args.dataset} -> {output_dir.name}")
+    pbar     = tqdm(total=len(tasks), desc=f"{args.dataset} -> {output_dir.name}")
     try:
         await asyncio.gather(*[
-            run_task(item, idx, agent_factory, sem, executor, pbar, output_dir)
-            for idx, item in enumerate(dataset)
+            run_task(task, idx, agent_factory, sem, executor, pbar, output_dir, base_cwd)
+            for idx, task in enumerate(tasks)
         ])
     finally:
         pbar.close()
